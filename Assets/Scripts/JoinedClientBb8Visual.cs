@@ -8,6 +8,7 @@ public sealed class JoinedClientBb8Visual : NetworkBehaviour
 
     private const string VisualRootName = "Joined Client BB8 Visual";
     private Transform visualRoot;
+    private GameObject modelInstance;
 
     public bool IsJoinedClientAvatar =>
         NetworkManager.Singleton != null && OwnerClientId != NetworkManager.ServerClientId;
@@ -18,15 +19,31 @@ public sealed class JoinedClientBb8Visual : NetworkBehaviour
             CreateVisual();
     }
 
+    private void LateUpdate()
+    {
+        if (IsJoinedClientAvatar && modelInstance == null)
+            CreateVisual();
+
+        if (modelInstance == null)
+            return;
+
+        modelInstance.SetActive(true);
+        foreach (Renderer renderer in modelInstance.GetComponentsInChildren<Renderer>(true))
+            renderer.enabled = true;
+    }
+
     private void CreateVisual()
     {
-        if (visualRoot != null)
+        if (modelInstance != null)
             return;
 
         HideMidasRenderers();
 
-        visualRoot = new GameObject(VisualRootName).transform;
-        visualRoot.SetParent(transform, false);
+        if (visualRoot == null)
+        {
+            visualRoot = new GameObject(VisualRootName).transform;
+            visualRoot.SetParent(transform, false);
+        }
 
         if (bb8ModelPrefab == null)
         {
@@ -34,14 +51,14 @@ public sealed class JoinedClientBb8Visual : NetworkBehaviour
             return;
         }
 
-        GameObject model = Instantiate(bb8ModelPrefab, visualRoot);
-        model.name = "Imported BB-8 Model";
-        model.transform.localPosition = Vector3.zero;
-        model.transform.localRotation = Quaternion.identity;
-        model.transform.localScale = Vector3.one;
+        modelInstance = Instantiate(bb8ModelPrefab, visualRoot);
+        modelInstance.name = "Imported BB-8 Model";
+        modelInstance.transform.localPosition = Vector3.zero;
+        modelInstance.transform.localRotation = Quaternion.identity;
+        modelInstance.transform.localScale = Vector3.one;
 
-        FitModelToAvatar(model.transform);
-        DisableModelColliders(model);
+        FitModelToAvatar(modelInstance.transform);
+        DisableModelColliders(modelInstance);
     }
 
     private void HideMidasRenderers()
