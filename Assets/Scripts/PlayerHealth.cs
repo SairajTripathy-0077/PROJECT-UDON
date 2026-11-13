@@ -558,7 +558,12 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (deathScreen != null) return;
 
-        deathScreen = new GameObject("Death Screen", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+        deathScreen = new GameObject(
+            "Death Screen",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasScaler),
+            typeof(GraphicRaycaster));
         Canvas canvas = deathScreen.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 200;
