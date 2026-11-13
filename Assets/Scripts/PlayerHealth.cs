@@ -15,8 +15,8 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private float minPunchSpeed = 1.2f;
     [SerializeField] private float maxPunchSpeed = 5f;
-    [SerializeField, Min(0f)] private float firstHitMinDamage = 0.8f;
-    [SerializeField, Min(0f)] private float firstHitMaxDamage = 1.5f;
+    [SerializeField, Min(0f)] private float firstHitMinDamage = 1.2f;
+    [SerializeField, Min(0f)] private float firstHitMaxDamage = 2.4f;
     [SerializeField] private float hitCooldown = 0.25f;
     [SerializeField] private float comboResetTime = 1.25f;
     [SerializeField] private float comboHit1Multiplier = 1f;

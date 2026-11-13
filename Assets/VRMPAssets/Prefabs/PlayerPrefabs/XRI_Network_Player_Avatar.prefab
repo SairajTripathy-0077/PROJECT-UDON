@@ -529,8 +529,8 @@ MonoBehaviour:
   maxHealth: 100
   minPunchSpeed: 1.2
   maxPunchSpeed: 5
-  firstHitMinDamage: 0.8
-  firstHitMaxDamage: 1.5
+  firstHitMinDamage: 1.2
+  firstHitMaxDamage: 2.4
   hitCooldown: 0.25
   comboResetTime: 1.25
   comboHit1Multiplier: 1
