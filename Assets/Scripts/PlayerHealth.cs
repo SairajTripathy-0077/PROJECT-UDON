@@ -22,6 +22,8 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField] private float comboHit1Multiplier = 1f;
     [SerializeField] private float comboHit2Multiplier = 1.25f;
     [SerializeField] private float comboHit3Multiplier = 1.33f;
+    [SerializeField] private float comboHit4Multiplier = 1.5f;
+    [SerializeField] private float comboHit5Multiplier = 2f;
     [SerializeField] private float bodyHeight = 1.8f;
     [SerializeField] private float bodyRadius = 0.32f;
     [SerializeField, Min(0.5f)] private float boxingSpawnHalfSpacing = 1.5f;
@@ -945,12 +947,14 @@ public class PlayerHealth : NetworkBehaviour
             lastHitTimes.TryGetValue(attackerClientId, out float previousHitTime) &&
             currentTime - previousHitTime <= comboResetTime)
         {
-            comboCount = previousComboCount >= 3 ? 1 : previousComboCount + 1;
+            comboCount = previousComboCount >= 5 ? 1 : previousComboCount + 1;
         }
 
         attackerComboCounts[attackerClientId] = comboCount;
         float comboMultiplier = comboCount == 1 ? comboHit1Multiplier :
-            comboCount == 2 ? comboHit2Multiplier : comboHit3Multiplier;
+            comboCount == 2 ? comboHit2Multiplier :
+            comboCount == 3 ? comboHit3Multiplier :
+            comboCount == 4 ? comboHit4Multiplier : comboHit5Multiplier;
         float speedFraction = Mathf.InverseLerp(minPunchSpeed, maxPunchSpeed, reportedPunchSpeed);
         float baseDamage = Mathf.Lerp(firstHitMinDamage, firstHitMaxDamage, speedFraction);
         float damage = baseDamage * comboMultiplier;

@@ -536,6 +536,8 @@ MonoBehaviour:
   comboHit1Multiplier: 1
   comboHit2Multiplier: 1.25
   comboHit3Multiplier: 1.33
+  comboHit4Multiplier: 1.5
+  comboHit5Multiplier: 2
   bodyHeight: 1.8
   bodyRadius: 0.32
   boxingSpawnHalfSpacing: 1.5
