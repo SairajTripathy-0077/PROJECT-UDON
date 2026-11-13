@@ -199,6 +199,7 @@ public class PlayerHealth : NetworkBehaviour
 
         // 2. Only show Midans mdol character model (and gloves if present)
         Transform modelRoot = transform.Find("Midans mdol");
+        ConfigureModelRenderers(modelRoot);
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
         {
             bool isModelRenderer = modelRoot != null &&
@@ -260,6 +261,17 @@ public class PlayerHealth : NetworkBehaviour
         ResolveLocalHandSources();
         SetupFirstPersonView();
         SetupOverheadHealthBar();
+    }
+
+    private static void ConfigureModelRenderers(Transform modelRoot)
+    {
+        if (modelRoot == null) return;
+
+        foreach (SkinnedMeshRenderer skinnedRenderer in modelRoot.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+        {
+            // IK can move limbs outside the imported bind-pose bounds.
+            skinnedRenderer.updateWhenOffscreen = true;
+        }
     }
 
     private void AlignBodyHitboxToModel(Transform modelRoot)

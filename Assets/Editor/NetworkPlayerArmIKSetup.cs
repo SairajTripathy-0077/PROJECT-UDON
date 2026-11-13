@@ -104,6 +104,12 @@ public static class NetworkPlayerArmIKSetup
             Renderer capsuleRenderer = capsule != null ? capsule.GetComponent<Renderer>() : null;
             if (capsuleRenderer != null) capsuleRenderer.enabled = false;
 
+            foreach (SkinnedMeshRenderer skinnedRenderer in model.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                skinnedRenderer.updateWhenOffscreen = true;
+                EditorUtility.SetDirty(skinnedRenderer);
+            }
+
             // 3. Configure NetworkPlayerArmIK
             NetworkPlayerArmIK ik = player.GetComponent<NetworkPlayerArmIK>();
             if (ik == null) ik = player.AddComponent<NetworkPlayerArmIK>();
