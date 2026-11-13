@@ -54,8 +54,8 @@ public sealed class JoinedClientBb8Visual : NetworkBehaviour
 
         modelInstance = Instantiate(bb8ModelPrefab, visualRoot);
         modelInstance.name = "Imported BB-8 Model";
-        modelInstance.transform.localPosition = Vector3.zero;
-        modelInstance.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        modelInstance.transform.localPosition = new Vector3(0f, 0f, 2.2f );
+        modelInstance.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
         modelInstance.transform.localScale = Vector3.one;
 
         FitModelToAvatar(modelInstance.transform);
