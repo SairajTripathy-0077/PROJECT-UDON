@@ -47,11 +47,7 @@ public class PlayerHealth : NetworkBehaviour
     private GameObject deathScreen;
     private Text deathTitle;
     private Text deathDetails;
-<<<<<<< HEAD
     private Button restartRoundButton;
-=======
-    private Button restartButton;
->>>>>>> chekmate90-fix-restart-button
     private Text combatFeedbackText;
     private Coroutine combatFeedbackRoutine;
     private AudioSource combatAudioSource;
@@ -68,12 +64,7 @@ public class PlayerHealth : NetworkBehaviour
     private Transform previousRightHandOrigin;
     private Transform sceneLeftGlove;
     private Transform sceneRightGlove;
-<<<<<<< HEAD
     private static bool roundOver;
-=======
-    private bool roundResetScheduled;
-    private Coroutine roundResetCoroutine;
->>>>>>> chekmate90-fix-restart-button
     private static bool hasBoxingSpawnCenter;
     private static Vector3 boxingSpawnCenter;
     private static Quaternion boxingSpawnOrientation;
@@ -576,7 +567,6 @@ public class PlayerHealth : NetworkBehaviour
         deathTitle = CreateDeathText("Result", overlay.transform, font, 54, FontStyle.Bold, new Vector2(0.1f, 0.53f), new Vector2(0.9f, 0.72f));
         deathDetails = CreateDeathText("Criteria", overlay.transform, font, 24, FontStyle.Normal, new Vector2(0.1f, 0.34f), new Vector2(0.9f, 0.52f));
 
-<<<<<<< HEAD
         GameObject restartButtonObject = new GameObject("Restart Round", typeof(RectTransform), typeof(Image), typeof(Button));
         restartButtonObject.transform.SetParent(overlay.transform, false);
         RectTransform restartButtonRect = restartButtonObject.GetComponent<RectTransform>();
@@ -604,24 +594,6 @@ public class PlayerHealth : NetworkBehaviour
         restartLabel.color = Color.white;
         restartLabel.text = "RESTART ROUND";
 
-=======
-        GameObject restartObject = new GameObject("Restart Button", typeof(RectTransform), typeof(Image), typeof(Button));
-        restartObject.transform.SetParent(overlay.transform, false);
-        RectTransform restartRect = restartObject.GetComponent<RectTransform>();
-        restartRect.anchorMin = new Vector2(0.3f, 0.13f);
-        restartRect.anchorMax = new Vector2(0.7f, 0.25f);
-        restartRect.offsetMin = Vector2.zero;
-        restartRect.offsetMax = Vector2.zero;
-
-        Image restartImage = restartObject.GetComponent<Image>();
-        restartImage.color = new Color(0.12f, 0.45f, 0.95f, 1f);
-        restartButton = restartObject.GetComponent<Button>();
-        restartButton.targetGraphic = restartImage;
-        restartButton.onClick.AddListener(RequestRoundRestart);
-
-        Text restartLabel = CreateDeathText("Label", restartObject.transform, font, 28, FontStyle.Bold, Vector2.zero, Vector2.one);
-        restartLabel.text = "RESTART ROUND";
->>>>>>> chekmate90-fix-restart-button
         deathScreen.SetActive(false);
     }
 
@@ -656,19 +628,10 @@ public class PlayerHealth : NetworkBehaviour
         if (deathTitle != null) deathTitle.text = defeated ? "KNOCKED OUT" : "YOU WIN";
         if (deathDetails != null)
             deathDetails.text = defeated
-<<<<<<< HEAD
                 ? "Knockout: health reached 0 from a valid punch."
                 : "Opponent reached 0 health from a valid punch.";
         if (restartRoundButton != null)
             restartRoundButton.interactable = NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
-=======
-                ? $"Knockout: health reached 0 from valid punches (1.2–5.0 m/s).\nRound restarts in {deathScreenSeconds:0} seconds."
-                : $"Opponent reached 0 health from valid punches.\nRound restarts in {deathScreenSeconds:0} seconds.";
-        if (restartButton != null)
-        {
-            restartButton.interactable = true;
-        }
->>>>>>> chekmate90-fix-restart-button
         deathScreen.SetActive(true);
     }
 
@@ -677,7 +640,6 @@ public class PlayerHealth : NetworkBehaviour
         if (deathScreen != null) deathScreen.SetActive(false);
     }
 
-<<<<<<< HEAD
     public void RequestRestartRound()
     {
         if (!IsOwner || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
@@ -725,32 +687,6 @@ public class PlayerHealth : NetworkBehaviour
         var moveProvider = FindFirstObjectByType<UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets.DynamicMoveProvider>();
         if (moveProvider != null)
             moveProvider.enabled = enabled;
-=======
-    private void RequestRoundRestart()
-    {
-        if (!IsOwner || !IsSpawned || restartButton == null || !restartButton.interactable)
-        {
-            return;
-        }
-
-        restartButton.interactable = false;
-        if (deathDetails != null)
-        {
-            deathDetails.text = "Restart requested.\nWaiting for the host...";
-        }
-        RequestRoundRestartServerRpc();
-    }
-
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    private void RequestRoundRestartServerRpc()
-    {
-        if (!IsServer || !ActivePlayers.Exists(player => player != null && player.IsSpawned && player.currentHealth.Value <= 0))
-        {
-            return;
-        }
-
-        ResetRoundNow();
->>>>>>> chekmate90-fix-restart-button
     }
 
     private static void RefreshHealthHud()
@@ -984,14 +920,6 @@ public class PlayerHealth : NetworkBehaviour
             roundOver = true;
             SetLocomotionEnabled(false);
             TriggerKnockoutClientRpc(OwnerClientId);
-<<<<<<< HEAD
-=======
-            if (!roundResetScheduled)
-            {
-                roundResetScheduled = true;
-                roundResetCoroutine = StartCoroutine(ResetRoundAfterKnockout());
-            }
->>>>>>> chekmate90-fix-restart-button
         }
     }
 
@@ -1034,41 +962,6 @@ public class PlayerHealth : NetworkBehaviour
         }
     }
 
-<<<<<<< HEAD
-=======
-    private IEnumerator ResetRoundAfterKnockout()
-    {
-        yield return new WaitForSeconds(deathScreenSeconds);
-        roundResetCoroutine = null;
-        ResetRoundNow();
-    }
-
-    private void ResetRoundNow()
-    {
-        foreach (PlayerHealth player in ActivePlayers)
-        {
-            if (player == null || !player.IsSpawned) continue;
-            if (player.roundResetCoroutine != null)
-            {
-                player.StopCoroutine(player.roundResetCoroutine);
-                player.roundResetCoroutine = null;
-            }
-            player.currentHealth.Value = player.maxHealth;
-            player.lastHitTimes.Clear();
-            player.attackerComboCounts.Clear();
-            player.roundResetScheduled = false;
-        }
-
-        ResetDeathScreensClientRpc();
-    }
-
-    [ClientRpc]
-    private void ResetDeathScreensClientRpc()
-    {
-        if (localPlayer != null) localPlayer.HideDeathScreen();
-    }
-
->>>>>>> chekmate90-fix-restart-button
     private void ResolveLocalHandSources()
     {
         if (xrOrigin == null) xrOrigin = FindFirstObjectByType<XROrigin>();
