@@ -15,10 +15,11 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private float minPunchSpeed = 1.2f;
     [SerializeField] private float maxPunchSpeed = 5f;
-    [SerializeField] private float damageMultiplier = 2f;
+    [SerializeField, Min(0f)] private float firstHitMinDamage = 0.8f;
+    [SerializeField, Min(0f)] private float firstHitMaxDamage = 1.5f;
     [SerializeField] private float hitCooldown = 0.25f;
     [SerializeField] private float comboResetTime = 1.25f;
-    [SerializeField] private float comboHit1Multiplier = 1.2f;
+    [SerializeField] private float comboHit1Multiplier = 1f;
     [SerializeField] private float comboHit2Multiplier = 1.25f;
     [SerializeField] private float comboHit3Multiplier = 1.33f;
     [SerializeField] private float bodyHeight = 1.8f;
@@ -77,8 +78,8 @@ public class PlayerHealth : NetworkBehaviour
     private Text overheadHealthBarText;
 
     // Synchronized variable across all connected clients
-    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
-        100,
+    public NetworkVariable<float> currentHealth = new NetworkVariable<float>(
+        100f,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
@@ -754,7 +755,7 @@ public class PlayerHealth : NetworkBehaviour
             RectTransform fillRect = localPlayer.healthBars[i].rectTransform;
             fillRect.anchorMax = new Vector2(fraction, 1f);
             localPlayer.healthBars[i].color = Color.Lerp(Color.red, Color.green, fraction);
-            localPlayer.healthLabels[i].text = $"P{player.OwnerClientId}  {player.currentHealth.Value}/{player.maxHealth} HP";
+            localPlayer.healthLabels[i].text = $"P{player.OwnerClientId}  {player.currentHealth.Value:0.##}/{player.maxHealth} HP";
         }
     }
 
@@ -950,12 +951,14 @@ public class PlayerHealth : NetworkBehaviour
         attackerComboCounts[attackerClientId] = comboCount;
         float comboMultiplier = comboCount == 1 ? comboHit1Multiplier :
             comboCount == 2 ? comboHit2Multiplier : comboHit3Multiplier;
-        int damage = Mathf.RoundToInt(reportedPunchSpeed * damageMultiplier * comboMultiplier);
+        float speedFraction = Mathf.InverseLerp(minPunchSpeed, maxPunchSpeed, reportedPunchSpeed);
+        float baseDamage = Mathf.Lerp(firstHitMinDamage, firstHitMaxDamage, speedFraction);
+        float damage = baseDamage * comboMultiplier;
         lastHitTimes[attackerClientId] = currentTime;
-        int previousHealth = currentHealth.Value;
+        float previousHealth = currentHealth.Value;
 
-        currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
-        bool knockedOut = previousHealth > 0 && currentHealth.Value == 0;
+        currentHealth.Value = Mathf.Max(0f, currentHealth.Value - damage);
+        bool knockedOut = previousHealth > 0f && currentHealth.Value <= 0f;
         HitFeedbackClientRpc(attackerClientId, comboCount, damage, comboMultiplier, reportedPunchSpeed, knockedOut);
 
         if (knockedOut)
@@ -967,7 +970,7 @@ public class PlayerHealth : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void HitFeedbackClientRpc(ulong attackerClientId, int comboCount, int damage, float comboMultiplier, float punchSpeed, bool knockedOut)
+    private void HitFeedbackClientRpc(ulong attackerClientId, int comboCount, float damage, float comboMultiplier, float punchSpeed, bool knockedOut)
     {
         if (!knockedOut)
         {
@@ -978,7 +981,7 @@ public class PlayerHealth : NetworkBehaviour
         if (localPlayer == null) return;
         if (localPlayer.OwnerClientId == OwnerClientId)
         {
-            localPlayer.ShowCombatFeedback($"-{damage} HP", new Color(1f, 0.42f, 0.32f));
+            localPlayer.ShowCombatFeedback($"-{damage:0.##} HP", new Color(1f, 0.42f, 0.32f));
             VRHaptics.TriggerDamageImpulse(damage);
         }
         else if (localPlayer.OwnerClientId == attackerClientId && comboCount > 1)
@@ -1162,7 +1165,7 @@ public class PlayerHealth : NetworkBehaviour
             overheadHealthBarFill.fillAmount = fraction;
             overheadHealthBarFill.color = barColor;
         }
-        string hpStr = $"{currentHealth.Value} / {maxHealth} HP";
+        string hpStr = $"{currentHealth.Value:0.##} / {maxHealth} HP";
         if (overheadHealthBarTMP != null) overheadHealthBarTMP.text = hpStr;
         if (overheadHealthBarText != null) overheadHealthBarText.text = hpStr;
     }

@@ -529,10 +529,11 @@ MonoBehaviour:
   maxHealth: 100
   minPunchSpeed: 1.2
   maxPunchSpeed: 5
-  damageMultiplier: 8
+  firstHitMinDamage: 0.8
+  firstHitMaxDamage: 1.5
   hitCooldown: 0.25
   comboResetTime: 1.25
-  comboHit1Multiplier: 1.2
+  comboHit1Multiplier: 1
   comboHit2Multiplier: 1.25
   comboHit3Multiplier: 1.33
   bodyHeight: 1.8
