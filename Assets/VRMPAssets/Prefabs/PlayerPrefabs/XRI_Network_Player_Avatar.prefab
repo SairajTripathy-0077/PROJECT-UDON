@@ -545,6 +545,9 @@ MonoBehaviour:
   punchHitAudio: {fileID: 8300000, guid: 86659fcc8828a0e4585e961bf2131c2e, type: 3}
   comboAudio: {fileID: 8300000, guid: 668fa52e44ee8934baab37b10ca8a24b, type: 3}
   knockoutAudio: {fileID: 8300000, guid: 8d1633eec0e30794db85b6c2dcd2b51b, type: 3}
+  uiClickAudio: {fileID: 8300000, guid: 4aa5e83ae912c46409c45fc3f4f5cfe4, type: 3}
+  highComboAudio: {fileID: 8300000, guid: 57ede49cb32093849b423cddb82a6f51, type: 3}
+  defeatAudio: {fileID: 8300000, guid: 3da96f4f3bf05c04ebee133a58a8af95, type: 3}
   currentHealth:
     m_InternalValue: 100
 --- !u!136 &7482910365128471940

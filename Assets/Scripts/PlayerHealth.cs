@@ -32,6 +32,9 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField] private AudioClip punchHitAudio;
     [SerializeField] private AudioClip comboAudio;
     [SerializeField] private AudioClip knockoutAudio;
+    [SerializeField] private AudioClip uiClickAudio;
+    [SerializeField] private AudioClip highComboAudio;
+    [SerializeField] private AudioClip defeatAudio;
 
     private static readonly Color[] PlayerColors =
     {
@@ -61,6 +64,9 @@ public class PlayerHealth : NetworkBehaviour
     private static AudioClip punchHitClip;
     private static AudioClip multiplierClip;
     private static AudioClip knockoutClip;
+    private static AudioClip uiClickClip;
+    private static AudioClip highComboClip;
+    private static AudioClip defeatClip;
     private readonly List<Image> healthBars = new();
     private readonly List<Text> healthLabels = new();
 
@@ -536,6 +542,9 @@ public class PlayerHealth : NetworkBehaviour
             knockoutClip = knockoutAudio != null
                 ? knockoutAudio
                 : Resources.Load<AudioClip>("BoxingAudio/KnockoutThud");
+        if (uiClickClip == null) uiClickClip = uiClickAudio;
+        if (highComboClip == null) highComboClip = highComboAudio;
+        if (defeatClip == null) defeatClip = defeatAudio;
     }
 
     private void PlayCombatOneShot(AudioClip clip, float volume)
@@ -663,6 +672,8 @@ public class PlayerHealth : NetworkBehaviour
             deathDetails.text = defeated
                 ? "Knockout: health reached 0 from a valid punch."
                 : "Opponent reached 0 health from a valid punch.";
+        if (defeated)
+            PlayCombatOneShot(defeatClip, 0.8f);
         if (restartRoundButton != null)
             restartRoundButton.interactable = NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
         deathScreen.SetActive(true);
@@ -678,6 +689,8 @@ public class PlayerHealth : NetworkBehaviour
         if (!IsOwner || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
             return;
 
+        EnsureCombatAudio();
+        PlayCombatOneShot(uiClickClip, 0.8f);
         if (restartRoundButton != null)
             restartRoundButton.interactable = false;
         RestartRoundServerRpc();
@@ -1005,6 +1018,8 @@ public class PlayerHealth : NetworkBehaviour
         {
             float multiplierVolume = comboCount == 2 ? 0.68f : 0.95f;
             localPlayer.PlayCombatOneShot(multiplierClip, multiplierVolume);
+            if (comboCount >= 4)
+                localPlayer.PlayCombatOneShot(highComboClip, comboCount >= 5 ? 1f : 0.85f);
             localPlayer.ShowCombatFeedback($"COMBO x{comboCount}  ·  {comboMultiplier:0.##}x DAMAGE", new Color(1f, 0.82f, 0.28f));
         }
     }
