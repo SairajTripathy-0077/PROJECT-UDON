@@ -274,6 +274,13 @@ public sealed class DesktopPlayerController : NetworkBehaviour
             Vector3 worldDirection = (transform.forward * moveZ + transform.right * moveX).normalized;
             float speed = isSprinting ? sprintSpeed : walkSpeed;
             transform.position += worldDirection * (speed * Time.deltaTime);
+
+            if (BoxingRingBoundary.Active != null)
+            {
+                Vector3 clampedPosition = transform.position;
+                if (BoxingRingBoundary.Active.TryClampPosition(ref clampedPosition))
+                    transform.position = clampedPosition;
+            }
         }
     }
 
