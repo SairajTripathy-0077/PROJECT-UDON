@@ -210,13 +210,18 @@ public class PlayerHealth : NetworkBehaviour
             }
         }
 
-        // 2. Only show Midans mdol character model (and gloves if present)
+        // 2. Show the host model or the joined-client BB-8 visual (and gloves if present)
         Transform modelRoot = transform.Find("Midans mdol");
+        JoinedClientBb8Visual bb8Visual = GetComponent<JoinedClientBb8Visual>();
+        bool useBb8Visual = bb8Visual != null && bb8Visual.IsJoinedClientAvatar;
         ConfigureModelRenderers(modelRoot);
+        Transform bb8Root = transform.Find("Joined Client BB8 Visual");
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
         {
-            bool isModelRenderer = modelRoot != null &&
+            bool isModelRenderer = !useBb8Visual && modelRoot != null &&
                 (renderer.transform == modelRoot || renderer.transform.IsChildOf(modelRoot));
+            bool isBb8Renderer = useBb8Visual && bb8Root != null &&
+                (renderer.transform == bb8Root || renderer.transform.IsChildOf(bb8Root));
             bool isGloveRenderer = renderer.CompareTag("Glove") && (modelRoot == null || !renderer.transform.IsChildOf(modelRoot));
 
             // Ensure no template hand renderers slip through
@@ -239,7 +244,7 @@ public class PlayerHealth : NetworkBehaviour
             }
             else
             {
-                renderer.enabled = isModelRenderer || isGloveRenderer;
+                renderer.enabled = isModelRenderer || isBb8Renderer || isGloveRenderer;
             }
         }
 
