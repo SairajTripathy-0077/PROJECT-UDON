@@ -4,7 +4,7 @@ using UnityEngine;
 [DefaultExecutionOrder(1000)]
 public sealed class JoinedClientBb8Visual : NetworkBehaviour
 {
-    [SerializeField] private GameObject bb8ModelPrefab;
+    private const string Bb8ResourceName = "bb-8";
 
     private const string VisualRootName = "Joined Client BB8 Visual";
     private Transform visualRoot;
@@ -45,9 +45,10 @@ public sealed class JoinedClientBb8Visual : NetworkBehaviour
             visualRoot.SetParent(transform, false);
         }
 
+        GameObject bb8ModelPrefab = Resources.Load<GameObject>(Bb8ResourceName);
         if (bb8ModelPrefab == null)
         {
-            Debug.LogError("JoinedClientBb8Visual requires an imported BB-8 model prefab.", this);
+            Debug.LogError($"JoinedClientBb8Visual could not load Resources/{Bb8ResourceName}.glb.", this);
             return;
         }
 

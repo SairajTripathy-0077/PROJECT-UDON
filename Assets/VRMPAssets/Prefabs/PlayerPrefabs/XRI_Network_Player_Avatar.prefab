@@ -653,7 +653,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d34f0e2b9c5d4a9e8f7b6c1d2e3a4b5c, type: 3}
   m_Name: ''
   m_EditorClassIdentifier: ''
-  bb8ModelPrefab: {fileID: -4161369568681901532, guid: 7dc2113eccee0514291ebf82a821ee17, type: 3}
 --- !u!1 &5908336471056132768
 GameObject:
   m_ObjectHideFlags: 0
