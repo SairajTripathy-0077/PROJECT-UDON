@@ -180,30 +180,40 @@ public sealed class NetworkPlayerArmIK : MonoBehaviour
         targetDist = Mathf.Clamp(targetDist, minReach, maxReach);
         Vector3 targetDirNorm = targetDir.normalized;
 
-        // Law of Cosines for shoulder angle
-        float cosA = (aLen * aLen + targetDist * targetDist - bLen * bLen) / (2f * aLen * targetDist);
-        cosA = Mathf.Clamp(cosA, -1f, 1f);
-        float angleA = Mathf.Acos(cosA) * Mathf.Rad2Deg;
-
-        // Calculate bend plane normal using pole direction
-        Vector3 normal = Vector3.Cross(targetDirNorm, poleVector.normalized);
-        if (normal.sqrMagnitude < 0.0001f)
+        // Build a stable bend plane from the target direction and pole direction.
+        Vector3 pole = poleVector.sqrMagnitude > 0.0001f
+            ? poleVector.normalized
+            : transform.up;
+        Vector3 bendNormal = Vector3.Cross(targetDirNorm, pole);
+        if (bendNormal.sqrMagnitude < 0.0001f)
         {
-            normal = Vector3.Cross(targetDirNorm, transform.up);
-            if (normal.sqrMagnitude < 0.0001f)
+            bendNormal = Vector3.Cross(targetDirNorm, transform.up);
+            if (bendNormal.sqrMagnitude < 0.0001f)
             {
-                normal = Vector3.Cross(targetDirNorm, transform.right);
+                bendNormal = Vector3.Cross(targetDirNorm, transform.right);
             }
         }
-        normal.Normalize();
+        bendNormal.Normalize();
+        Vector3 bendDirection = Vector3.Cross(bendNormal, targetDirNorm).normalized;
+        if (Vector3.Dot(bendDirection, pole) < 0f)
+        {
+            bendDirection = -bendDirection;
+        }
 
-        // 1. Solve Upper Arm rotation
-        Vector3 desiredUpperDir = (Quaternion.AngleAxis(angleA, normal) * targetDirNorm).normalized;
+        // Law of cosines gives the exact elbow position for the clamped target.
+        float elbowAlongTarget = (aLen * aLen + targetDist * targetDist - bLen * bLen) / (2f * targetDist);
+        float elbowHeight = Mathf.Sqrt(Mathf.Max(0f, aLen * aLen - elbowAlongTarget * elbowAlongTarget));
+        Vector3 desiredElbow = aPos
+            + targetDirNorm * elbowAlongTarget
+            + bendDirection * elbowHeight;
+
+        // 1. Rotate the upper arm toward the pole-guided elbow.
         Vector3 currentUpperDir = (bPos - aPos).normalized;
+        Vector3 desiredUpperDir = (desiredElbow - aPos).normalized;
         Quaternion upperRotDelta = Quaternion.FromToRotation(currentUpperDir, desiredUpperDir);
         upperArm.rotation = Quaternion.Slerp(upperArm.rotation, upperRotDelta * upperArm.rotation, positionWeight);
 
-        // 2. Solve Forearm rotation
+        // 2. Rotate the forearm toward the target after the shoulder has moved.
         Vector3 currentForearmDir = (hand.position - forearm.position).normalized;
         Vector3 desiredForearmDir = (tPos - forearm.position).normalized;
         Quaternion forearmRotDelta = Quaternion.FromToRotation(currentForearmDir, desiredForearmDir);

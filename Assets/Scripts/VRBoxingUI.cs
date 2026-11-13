@@ -388,7 +388,7 @@ public class VRBoxingUI : MonoBehaviour
         return fillImg;
     }
 
-    public void UpdatePlayerHealth(ulong clientId, int currentHp, int maxHp)
+    public void UpdatePlayerHealth(ulong clientId, float currentHp, int maxHp)
     {
         float fraction = maxHp > 0 ? Mathf.Clamp01((float)currentHp / maxHp) : 0f;
 

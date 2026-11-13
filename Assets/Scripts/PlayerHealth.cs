@@ -15,16 +15,26 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private float minPunchSpeed = 1.2f;
     [SerializeField] private float maxPunchSpeed = 5f;
-    [SerializeField] private float damageMultiplier = 2f;
+    [SerializeField, Min(0f)] private float firstHitMinDamage = 2.5f;
+    [SerializeField, Min(0f)] private float firstHitMaxDamage = 2.5f;
     [SerializeField] private float hitCooldown = 0.25f;
     [SerializeField] private float comboResetTime = 1.25f;
-    [SerializeField] private float comboHit1Multiplier = 1.2f;
+    [SerializeField] private float comboHit1Multiplier = 1f;
     [SerializeField] private float comboHit2Multiplier = 1.25f;
     [SerializeField] private float comboHit3Multiplier = 1.33f;
+    [SerializeField] private float comboHit4Multiplier = 1.5f;
+    [SerializeField] private float comboHit5Multiplier = 2f;
     [SerializeField] private float bodyHeight = 1.8f;
     [SerializeField] private float bodyRadius = 0.32f;
     [SerializeField, Min(0.5f)] private float boxingSpawnHalfSpacing = 1.5f;
     [SerializeField, Min(1f)] private float deathScreenSeconds = 5f;
+    [Header("Combat Audio")]
+    [SerializeField] private AudioClip punchHitAudio;
+    [SerializeField] private AudioClip comboAudio;
+    [SerializeField] private AudioClip knockoutAudio;
+    [SerializeField] private AudioClip uiClickAudio;
+    [SerializeField] private AudioClip highComboAudio;
+    [SerializeField] private AudioClip defeatAudio;
 
     private static readonly Color[] PlayerColors =
     {
@@ -54,6 +64,9 @@ public class PlayerHealth : NetworkBehaviour
     private static AudioClip punchHitClip;
     private static AudioClip multiplierClip;
     private static AudioClip knockoutClip;
+    private static AudioClip uiClickClip;
+    private static AudioClip highComboClip;
+    private static AudioClip defeatClip;
     private readonly List<Image> healthBars = new();
     private readonly List<Text> healthLabels = new();
 
@@ -77,8 +90,8 @@ public class PlayerHealth : NetworkBehaviour
     private Text overheadHealthBarText;
 
     // Synchronized variable across all connected clients
-    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
-        100,
+    public NetworkVariable<float> currentHealth = new NetworkVariable<float>(
+        100f,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
@@ -159,7 +172,7 @@ public class PlayerHealth : NetworkBehaviour
         RefreshHealthHud();
     }
 
-    private void OnHealthChanged(int previousValue, int newValue)
+    private void OnHealthChanged(float previousValue, float newValue)
     {
         UpdateOverheadHealthBar();
         RefreshHealthHud();
@@ -199,6 +212,7 @@ public class PlayerHealth : NetworkBehaviour
 
         // 2. Only show Midans mdol character model (and gloves if present)
         Transform modelRoot = transform.Find("Midans mdol");
+        ConfigureModelRenderers(modelRoot);
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
         {
             bool isModelRenderer = modelRoot != null &&
@@ -260,6 +274,17 @@ public class PlayerHealth : NetworkBehaviour
         ResolveLocalHandSources();
         SetupFirstPersonView();
         SetupOverheadHealthBar();
+    }
+
+    private static void ConfigureModelRenderers(Transform modelRoot)
+    {
+        if (modelRoot == null) return;
+
+        foreach (SkinnedMeshRenderer skinnedRenderer in modelRoot.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+        {
+            // IK can move limbs outside the imported bind-pose bounds.
+            skinnedRenderer.updateWhenOffscreen = true;
+        }
     }
 
     private void AlignBodyHitboxToModel(Transform modelRoot)
@@ -359,15 +384,11 @@ public class PlayerHealth : NetworkBehaviour
         {
             Vector3 camPos = xrOrigin.Camera.transform.position;
             Vector3 groundPos = new Vector3(camPos.x, xrOrigin.transform.position.y, camPos.z);
-            Vector3 camForward = Vector3.ProjectOnPlane(xrOrigin.Camera.transform.forward, Vector3.up).normalized;
-            if (camForward.sqrMagnitude > 0.001f)
-            {
-                transform.SetPositionAndRotation(groundPos, Quaternion.LookRotation(camForward, Vector3.up));
-            }
-            else
-            {
-                transform.position = groundPos;
-            }
+            // Keep the network avatar's body aligned to the rig's yaw, not the
+            // headset's world yaw. The headset is a child of the XR Origin, so
+            // rotating the body toward its world forward every frame feeds the
+            // rig rotation back into itself and can reverse/cancel head turning.
+            transform.position = groundPos;
 
             if (headPose != null)
             {
@@ -509,9 +530,21 @@ public class PlayerHealth : NetworkBehaviour
         combatAudioSource.maxDistance = 35f;
         combatAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
 
-        if (punchHitClip == null) punchHitClip = Resources.Load<AudioClip>("BoxingAudio/PunchHeavy");
-        if (multiplierClip == null) multiplierClip = Resources.Load<AudioClip>("BoxingAudio/MultiplierImpact");
-        if (knockoutClip == null) knockoutClip = Resources.Load<AudioClip>("BoxingAudio/KnockoutThud");
+        if (punchHitClip == null)
+            punchHitClip = punchHitAudio != null
+                ? punchHitAudio
+                : Resources.Load<AudioClip>("BoxingAudio/PunchHeavy");
+        if (multiplierClip == null)
+            multiplierClip = comboAudio != null
+                ? comboAudio
+                : Resources.Load<AudioClip>("BoxingAudio/MultiplierImpact");
+        if (knockoutClip == null)
+            knockoutClip = knockoutAudio != null
+                ? knockoutAudio
+                : Resources.Load<AudioClip>("BoxingAudio/KnockoutThud");
+        if (uiClickClip == null) uiClickClip = uiClickAudio;
+        if (highComboClip == null) highComboClip = highComboAudio;
+        if (defeatClip == null) defeatClip = defeatAudio;
     }
 
     private void PlayCombatOneShot(AudioClip clip, float volume)
@@ -550,7 +583,12 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (deathScreen != null) return;
 
-        deathScreen = new GameObject("Death Screen", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+        deathScreen = new GameObject(
+            "Death Screen",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasScaler),
+            typeof(GraphicRaycaster));
         Canvas canvas = deathScreen.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 200;
@@ -634,6 +672,8 @@ public class PlayerHealth : NetworkBehaviour
             deathDetails.text = defeated
                 ? "Knockout: health reached 0 from a valid punch."
                 : "Opponent reached 0 health from a valid punch.";
+        if (defeated)
+            PlayCombatOneShot(defeatClip, 0.8f);
         if (restartRoundButton != null)
             restartRoundButton.interactable = NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
         deathScreen.SetActive(true);
@@ -649,6 +689,10 @@ public class PlayerHealth : NetworkBehaviour
         if (!IsOwner || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
             return;
 
+        EnsureCombatAudio();
+        PlayCombatOneShot(uiClickClip, 0.8f);
+        if (restartRoundButton != null)
+            restartRoundButton.interactable = false;
         RestartRoundServerRpc();
     }
 
@@ -680,10 +724,34 @@ public class PlayerHealth : NetworkBehaviour
         SetLocomotionEnabled(true);
         if (localPlayer != null)
         {
+            localPlayer.ResetLocalRoundState();
             localPlayer.HideDeathScreen();
             if (VRBoxingUI.Instance != null)
                 VRBoxingUI.Instance.HideKnockoutAnnouncement();
         }
+    }
+
+    private void ResetLocalRoundState()
+    {
+        if (desktopController == null)
+            desktopController = GetComponent<DesktopPlayerController>();
+        if (desktopController != null)
+            desktopController.ResetRoundInput();
+
+        if (IsOwner)
+        {
+            PositionAtBoxingSpawn();
+            if (headPose != null && xrOrigin != null && xrOrigin.Camera != null)
+                headPose.SetPositionAndRotation(
+                    xrOrigin.Camera.transform.position,
+                    xrOrigin.Camera.transform.rotation);
+        }
+
+        previousLeftHandOrigin = null;
+        previousRightHandOrigin = null;
+        sceneLeftGlove = null;
+        sceneRightGlove = null;
+        ResolveLocalHandSources();
     }
 
     private static void SetLocomotionEnabled(bool enabled)
@@ -715,7 +783,7 @@ public class PlayerHealth : NetworkBehaviour
             RectTransform fillRect = localPlayer.healthBars[i].rectTransform;
             fillRect.anchorMax = new Vector2(fraction, 1f);
             localPlayer.healthBars[i].color = Color.Lerp(Color.red, Color.green, fraction);
-            localPlayer.healthLabels[i].text = $"P{player.OwnerClientId}  {player.currentHealth.Value}/{player.maxHealth} HP";
+            localPlayer.healthLabels[i].text = $"P{player.OwnerClientId}  {player.currentHealth.Value:0.##}/{player.maxHealth} HP";
         }
     }
 
@@ -905,18 +973,22 @@ public class PlayerHealth : NetworkBehaviour
             lastHitTimes.TryGetValue(attackerClientId, out float previousHitTime) &&
             currentTime - previousHitTime <= comboResetTime)
         {
-            comboCount = previousComboCount >= 3 ? 1 : previousComboCount + 1;
+            comboCount = previousComboCount >= 5 ? 1 : previousComboCount + 1;
         }
 
         attackerComboCounts[attackerClientId] = comboCount;
         float comboMultiplier = comboCount == 1 ? comboHit1Multiplier :
-            comboCount == 2 ? comboHit2Multiplier : comboHit3Multiplier;
-        int damage = Mathf.RoundToInt(reportedPunchSpeed * damageMultiplier * comboMultiplier);
+            comboCount == 2 ? comboHit2Multiplier :
+            comboCount == 3 ? comboHit3Multiplier :
+            comboCount == 4 ? comboHit4Multiplier : comboHit5Multiplier;
+        float speedFraction = Mathf.InverseLerp(minPunchSpeed, maxPunchSpeed, reportedPunchSpeed);
+        float baseDamage = Mathf.Lerp(firstHitMinDamage, firstHitMaxDamage, speedFraction);
+        float damage = baseDamage * comboMultiplier;
         lastHitTimes[attackerClientId] = currentTime;
-        int previousHealth = currentHealth.Value;
+        float previousHealth = currentHealth.Value;
 
-        currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
-        bool knockedOut = previousHealth > 0 && currentHealth.Value == 0;
+        currentHealth.Value = Mathf.Max(0f, currentHealth.Value - damage);
+        bool knockedOut = previousHealth > 0f && currentHealth.Value <= 0f;
         HitFeedbackClientRpc(attackerClientId, comboCount, damage, comboMultiplier, reportedPunchSpeed, knockedOut);
 
         if (knockedOut)
@@ -928,7 +1000,7 @@ public class PlayerHealth : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void HitFeedbackClientRpc(ulong attackerClientId, int comboCount, int damage, float comboMultiplier, float punchSpeed, bool knockedOut)
+    private void HitFeedbackClientRpc(ulong attackerClientId, int comboCount, float damage, float comboMultiplier, float punchSpeed, bool knockedOut)
     {
         if (!knockedOut)
         {
@@ -939,13 +1011,15 @@ public class PlayerHealth : NetworkBehaviour
         if (localPlayer == null) return;
         if (localPlayer.OwnerClientId == OwnerClientId)
         {
-            localPlayer.ShowCombatFeedback($"-{damage} HP", new Color(1f, 0.42f, 0.32f));
+            localPlayer.ShowCombatFeedback($"-{damage:0.##} HP", new Color(1f, 0.42f, 0.32f));
             VRHaptics.TriggerDamageImpulse(damage);
         }
         else if (localPlayer.OwnerClientId == attackerClientId && comboCount > 1)
         {
             float multiplierVolume = comboCount == 2 ? 0.68f : 0.95f;
             localPlayer.PlayCombatOneShot(multiplierClip, multiplierVolume);
+            if (comboCount >= 4)
+                localPlayer.PlayCombatOneShot(highComboClip, comboCount >= 5 ? 1f : 0.85f);
             localPlayer.ShowCombatFeedback($"COMBO x{comboCount}  ·  {comboMultiplier:0.##}x DAMAGE", new Color(1f, 0.82f, 0.28f));
         }
     }
@@ -993,32 +1067,37 @@ public class PlayerHealth : NetworkBehaviour
 
     private void SetupFirstPersonView()
     {
-        if (modelHeadBone == null)
+        Transform modelRoot = transform.Find("Midans mdol");
+        if (modelRoot != null)
         {
-            Transform modelRoot = transform.Find("Midans mdol");
-            if (modelRoot != null)
+            foreach (Renderer renderer in modelRoot.GetComponentsInChildren<Renderer>(true))
             {
-                modelHeadBone = FindChildRecursive(modelRoot, "mixamorig:Head");
-            }
-            if (modelHeadBone == null)
-            {
-                modelHeadBone = FindChildRecursive(transform, "mixamorig:Head");
+                if (IsFaceRenderer(renderer))
+                    renderer.enabled = !IsOwner;
             }
         }
 
+        if (modelHeadBone == null)
+            modelHeadBone = FindChildRecursive(modelRoot != null ? modelRoot : transform, "mixamorig:Head");
+
         if (modelHeadBone != null)
         {
-            if (IsOwner)
-            {
-                // Local player: hide head bone mesh so it doesn't block the VR camera view
-                modelHeadBone.localScale = Vector3.zero;
-            }
-            else
-            {
-                // Remote player: ensure head is visible to opponents
-                modelHeadBone.localScale = Vector3.one;
-            }
+            // Keep the skeleton intact for IK and animation; hide only the face renderers above.
+            modelHeadBone.localScale = Vector3.one;
         }
+    }
+
+    private static bool IsFaceRenderer(Renderer renderer)
+    {
+        if (renderer == null) return false;
+
+        foreach (Material material in renderer.sharedMaterials)
+        {
+            if (material != null && material.name.StartsWith("Head", System.StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     private void SetupOverheadHealthBar()
@@ -1118,7 +1197,7 @@ public class PlayerHealth : NetworkBehaviour
             overheadHealthBarFill.fillAmount = fraction;
             overheadHealthBarFill.color = barColor;
         }
-        string hpStr = $"{currentHealth.Value} / {maxHealth} HP";
+        string hpStr = $"{currentHealth.Value:0.##} / {maxHealth} HP";
         if (overheadHealthBarTMP != null) overheadHealthBarTMP.text = hpStr;
         if (overheadHealthBarText != null) overheadHealthBarText.text = hpStr;
     }
