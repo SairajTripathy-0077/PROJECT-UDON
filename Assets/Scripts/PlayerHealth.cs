@@ -28,6 +28,10 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField] private float bodyRadius = 0.32f;
     [SerializeField, Min(0.5f)] private float boxingSpawnHalfSpacing = 1.5f;
     [SerializeField, Min(1f)] private float deathScreenSeconds = 5f;
+    [Header("Combat Audio")]
+    [SerializeField] private AudioClip punchHitAudio;
+    [SerializeField] private AudioClip comboAudio;
+    [SerializeField] private AudioClip knockoutAudio;
 
     private static readonly Color[] PlayerColors =
     {
@@ -520,9 +524,18 @@ public class PlayerHealth : NetworkBehaviour
         combatAudioSource.maxDistance = 35f;
         combatAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
 
-        if (punchHitClip == null) punchHitClip = Resources.Load<AudioClip>("BoxingAudio/PunchHeavy");
-        if (multiplierClip == null) multiplierClip = Resources.Load<AudioClip>("BoxingAudio/MultiplierImpact");
-        if (knockoutClip == null) knockoutClip = Resources.Load<AudioClip>("BoxingAudio/KnockoutThud");
+        if (punchHitClip == null)
+            punchHitClip = punchHitAudio != null
+                ? punchHitAudio
+                : Resources.Load<AudioClip>("BoxingAudio/PunchHeavy");
+        if (multiplierClip == null)
+            multiplierClip = comboAudio != null
+                ? comboAudio
+                : Resources.Load<AudioClip>("BoxingAudio/MultiplierImpact");
+        if (knockoutClip == null)
+            knockoutClip = knockoutAudio != null
+                ? knockoutAudio
+                : Resources.Load<AudioClip>("BoxingAudio/KnockoutThud");
     }
 
     private void PlayCombatOneShot(AudioClip clip, float volume)
