@@ -160,7 +160,7 @@ public class PlayerHealth : NetworkBehaviour
         RefreshHealthHud();
     }
 
-    private void OnHealthChanged(int previousValue, int newValue)
+    private void OnHealthChanged(float previousValue, float newValue)
     {
         UpdateOverheadHealthBar();
         RefreshHealthHud();
