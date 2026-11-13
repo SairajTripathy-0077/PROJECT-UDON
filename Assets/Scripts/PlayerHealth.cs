@@ -359,15 +359,11 @@ public class PlayerHealth : NetworkBehaviour
         {
             Vector3 camPos = xrOrigin.Camera.transform.position;
             Vector3 groundPos = new Vector3(camPos.x, xrOrigin.transform.position.y, camPos.z);
-            Vector3 camForward = Vector3.ProjectOnPlane(xrOrigin.Camera.transform.forward, Vector3.up).normalized;
-            if (camForward.sqrMagnitude > 0.001f)
-            {
-                transform.SetPositionAndRotation(groundPos, Quaternion.LookRotation(camForward, Vector3.up));
-            }
-            else
-            {
-                transform.position = groundPos;
-            }
+            // Keep the network avatar's body aligned to the rig's yaw, not the
+            // headset's world yaw. The headset is a child of the XR Origin, so
+            // rotating the body toward its world forward every frame feeds the
+            // rig rotation back into itself and can reverse/cancel head turning.
+            transform.position = groundPos;
 
             if (headPose != null)
             {
