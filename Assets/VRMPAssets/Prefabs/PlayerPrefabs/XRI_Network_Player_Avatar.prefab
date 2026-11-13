@@ -629,7 +629,6 @@ MonoBehaviour:
   sprintSpeed: 4.8
   mouseSensitivity: 1.6
   eyeHeight: 1.65
-  ringRadius: 4.2
   leftGuardForward: 0.28
   leftGuardInward: 0.12
   rightGuardForward: 0.38
