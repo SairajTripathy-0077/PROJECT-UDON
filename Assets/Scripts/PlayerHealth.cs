@@ -1001,32 +1001,37 @@ public class PlayerHealth : NetworkBehaviour
 
     private void SetupFirstPersonView()
     {
-        if (modelHeadBone == null)
+        Transform modelRoot = transform.Find("Midans mdol");
+        if (modelRoot != null)
         {
-            Transform modelRoot = transform.Find("Midans mdol");
-            if (modelRoot != null)
+            foreach (Renderer renderer in modelRoot.GetComponentsInChildren<Renderer>(true))
             {
-                modelHeadBone = FindChildRecursive(modelRoot, "mixamorig:Head");
-            }
-            if (modelHeadBone == null)
-            {
-                modelHeadBone = FindChildRecursive(transform, "mixamorig:Head");
+                if (IsFaceRenderer(renderer))
+                    renderer.enabled = !IsOwner;
             }
         }
 
+        if (modelHeadBone == null)
+            modelHeadBone = FindChildRecursive(modelRoot != null ? modelRoot : transform, "mixamorig:Head");
+
         if (modelHeadBone != null)
         {
-            if (IsOwner)
-            {
-                // Local player: hide head bone mesh so it doesn't block the VR camera view
-                modelHeadBone.localScale = Vector3.zero;
-            }
-            else
-            {
-                // Remote player: ensure head is visible to opponents
-                modelHeadBone.localScale = Vector3.one;
-            }
+            // Keep the skeleton intact for IK and animation; hide only the face renderers above.
+            modelHeadBone.localScale = Vector3.one;
         }
+    }
+
+    private static bool IsFaceRenderer(Renderer renderer)
+    {
+        if (renderer == null) return false;
+
+        foreach (Material material in renderer.sharedMaterials)
+        {
+            if (material != null && material.name.StartsWith("Head", System.StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     private void SetupOverheadHealthBar()
