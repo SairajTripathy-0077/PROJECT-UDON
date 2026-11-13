@@ -47,6 +47,7 @@ public class PlayerHealth : NetworkBehaviour
     private GameObject deathScreen;
     private Text deathTitle;
     private Text deathDetails;
+    private Button restartButton;
     private Text combatFeedbackText;
     private Coroutine combatFeedbackRoutine;
     private AudioSource combatAudioSource;
@@ -64,6 +65,7 @@ public class PlayerHealth : NetworkBehaviour
     private Transform sceneLeftGlove;
     private Transform sceneRightGlove;
     private bool roundResetScheduled;
+    private Coroutine roundResetCoroutine;
     private static bool hasBoxingSpawnCenter;
     private static Vector3 boxingSpawnCenter;
     private static Quaternion boxingSpawnOrientation;
@@ -566,6 +568,23 @@ public class PlayerHealth : NetworkBehaviour
         Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         deathTitle = CreateDeathText("Result", overlay.transform, font, 54, FontStyle.Bold, new Vector2(0.1f, 0.53f), new Vector2(0.9f, 0.72f));
         deathDetails = CreateDeathText("Criteria", overlay.transform, font, 24, FontStyle.Normal, new Vector2(0.1f, 0.34f), new Vector2(0.9f, 0.52f));
+
+        GameObject restartObject = new GameObject("Restart Button", typeof(RectTransform), typeof(Image), typeof(Button));
+        restartObject.transform.SetParent(overlay.transform, false);
+        RectTransform restartRect = restartObject.GetComponent<RectTransform>();
+        restartRect.anchorMin = new Vector2(0.3f, 0.13f);
+        restartRect.anchorMax = new Vector2(0.7f, 0.25f);
+        restartRect.offsetMin = Vector2.zero;
+        restartRect.offsetMax = Vector2.zero;
+
+        Image restartImage = restartObject.GetComponent<Image>();
+        restartImage.color = new Color(0.12f, 0.45f, 0.95f, 1f);
+        restartButton = restartObject.GetComponent<Button>();
+        restartButton.targetGraphic = restartImage;
+        restartButton.onClick.AddListener(RequestRoundRestart);
+
+        Text restartLabel = CreateDeathText("Label", restartObject.transform, font, 28, FontStyle.Bold, Vector2.zero, Vector2.one);
+        restartLabel.text = "RESTART ROUND";
         deathScreen.SetActive(false);
     }
 
@@ -602,12 +621,42 @@ public class PlayerHealth : NetworkBehaviour
             deathDetails.text = defeated
                 ? $"Knockout: health reached 0 from valid punches (1.2–5.0 m/s).\nRound restarts in {deathScreenSeconds:0} seconds."
                 : $"Opponent reached 0 health from valid punches.\nRound restarts in {deathScreenSeconds:0} seconds.";
+        if (restartButton != null)
+        {
+            restartButton.interactable = true;
+        }
         deathScreen.SetActive(true);
     }
 
     private void HideDeathScreen()
     {
         if (deathScreen != null) deathScreen.SetActive(false);
+    }
+
+    private void RequestRoundRestart()
+    {
+        if (!IsOwner || !IsSpawned || restartButton == null || !restartButton.interactable)
+        {
+            return;
+        }
+
+        restartButton.interactable = false;
+        if (deathDetails != null)
+        {
+            deathDetails.text = "Restart requested.\nWaiting for the host...";
+        }
+        RequestRoundRestartServerRpc();
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void RequestRoundRestartServerRpc()
+    {
+        if (!IsServer || !ActivePlayers.Exists(player => player != null && player.IsSpawned && player.currentHealth.Value <= 0))
+        {
+            return;
+        }
+
+        ResetRoundNow();
     }
 
     private static void RefreshHealthHud()
@@ -836,7 +885,7 @@ public class PlayerHealth : NetworkBehaviour
             if (!roundResetScheduled)
             {
                 roundResetScheduled = true;
-                StartCoroutine(ResetRoundAfterKnockout());
+                roundResetCoroutine = StartCoroutine(ResetRoundAfterKnockout());
             }
         }
     }
@@ -881,10 +930,20 @@ public class PlayerHealth : NetworkBehaviour
     private IEnumerator ResetRoundAfterKnockout()
     {
         yield return new WaitForSeconds(deathScreenSeconds);
+        roundResetCoroutine = null;
+        ResetRoundNow();
+    }
 
+    private void ResetRoundNow()
+    {
         foreach (PlayerHealth player in ActivePlayers)
         {
             if (player == null || !player.IsSpawned) continue;
+            if (player.roundResetCoroutine != null)
+            {
+                player.StopCoroutine(player.roundResetCoroutine);
+                player.roundResetCoroutine = null;
+            }
             player.currentHealth.Value = player.maxHealth;
             player.lastHitTimes.Clear();
             player.attackerComboCounts.Clear();
