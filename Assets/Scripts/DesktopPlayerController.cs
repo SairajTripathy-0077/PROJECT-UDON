@@ -47,6 +47,7 @@ public sealed class DesktopPlayerController : NetworkBehaviour
     private float yaw;
     private float pitch;
     private GameObject crosshairCanvas;
+    private bool suppressCursorLockUntilMouseRelease;
 
     // Punch state
     private float leftPunchTimer = -1f;
@@ -163,6 +164,20 @@ public sealed class DesktopPlayerController : NetworkBehaviour
         Cursor.visible = true;
     }
 
+    public void ResetRoundInput()
+    {
+        leftPunchTimer = -1f;
+        rightPunchTimer = -1f;
+        isLeftPunching = false;
+        isRightPunching = false;
+        isBlocking = false;
+        yaw = transform.eulerAngles.y;
+        pitch = 0f;
+        suppressCursorLockUntilMouseRelease = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     private void Update()
     {
         if (!IsSpawned || !IsOwner) return;
@@ -199,6 +214,13 @@ public sealed class DesktopPlayerController : NetworkBehaviour
     {
         var keyboard = Keyboard.current;
         var mouse = Mouse.current;
+
+        if (suppressCursorLockUntilMouseRelease)
+        {
+            if (mouse == null || !mouse.leftButton.isPressed)
+                suppressCursorLockUntilMouseRelease = false;
+            return;
+        }
 
         if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
         {

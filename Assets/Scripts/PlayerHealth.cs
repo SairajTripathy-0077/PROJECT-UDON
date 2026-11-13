@@ -662,6 +662,8 @@ public class PlayerHealth : NetworkBehaviour
         if (!IsOwner || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
             return;
 
+        if (restartRoundButton != null)
+            restartRoundButton.interactable = false;
         RestartRoundServerRpc();
     }
 
@@ -693,10 +695,34 @@ public class PlayerHealth : NetworkBehaviour
         SetLocomotionEnabled(true);
         if (localPlayer != null)
         {
+            localPlayer.ResetLocalRoundState();
             localPlayer.HideDeathScreen();
             if (VRBoxingUI.Instance != null)
                 VRBoxingUI.Instance.HideKnockoutAnnouncement();
         }
+    }
+
+    private void ResetLocalRoundState()
+    {
+        if (desktopController == null)
+            desktopController = GetComponent<DesktopPlayerController>();
+        if (desktopController != null)
+            desktopController.ResetRoundInput();
+
+        if (IsOwner)
+        {
+            PositionAtBoxingSpawn();
+            if (headPose != null && xrOrigin != null && xrOrigin.Camera != null)
+                headPose.SetPositionAndRotation(
+                    xrOrigin.Camera.transform.position,
+                    xrOrigin.Camera.transform.rotation);
+        }
+
+        previousLeftHandOrigin = null;
+        previousRightHandOrigin = null;
+        sceneLeftGlove = null;
+        sceneRightGlove = null;
+        ResolveLocalHandSources();
     }
 
     private static void SetLocomotionEnabled(bool enabled)
