@@ -65,7 +65,10 @@ public sealed class BoxingRingBoundary : MonoBehaviour
             Destroy(existing.gameObject);
 
         Transform boundaryRoot = new GameObject(BoundaryRootName).transform;
-        boundaryRoot.SetParent(transform, false);
+        // Wall positions and the player clamp are calculated from renderer.bounds,
+        // which are world-space bounds. Keep the generated walls in world space so
+        // they do not inherit the network player's movement or rotation.
+        boundaryRoot.SetParent(null, true);
         CreateWall(boundaryRoot, "North", new Vector3(ringBounds.center.x, ringBounds.center.y, ringBounds.max.z),
             new Vector3(ringBounds.size.x, wallHeight, wallThickness));
         CreateWall(boundaryRoot, "South", new Vector3(ringBounds.center.x, ringBounds.center.y, ringBounds.min.z),
