@@ -26,12 +26,6 @@ public sealed class DesktopPlayerController : NetworkBehaviour
     [SerializeField] private float rightGuardInward = 0.06f;
     [SerializeField] private float guardHeightOffset = 0.08f;
 
-    [Header("Glove Orientation")]
-    [Tooltip("Local rotation offset for the left glove target. Positive roll turns the palm inward.")]
-    [SerializeField] private Vector3 leftGloveRotationOffset = new Vector3(0f, 0f, 90f);
-    [Tooltip("Local rotation offset for the right glove target. Negative roll turns the palm inward.")]
-    [SerializeField] private Vector3 rightGloveRotationOffset = new Vector3(0f, 0f, -90f);
-
     [Header("Punch Tuning (Straight Arm Extension)")]
     [SerializeField] private float punchOutDuration = 0.08f;
     [SerializeField] private float punchHoldDuration = 0.03f;
@@ -400,16 +394,12 @@ public sealed class DesktopPlayerController : NetworkBehaviour
 
         if (leftHandTarget != null)
         {
-            leftHandTarget.SetPositionAndRotation(
-                leftPos,
-                camFacingRot * Quaternion.Euler(leftGloveRotationOffset));
+            leftHandTarget.SetPositionAndRotation(leftPos, camFacingRot);
         }
 
         if (rightHandTarget != null)
         {
-            rightHandTarget.SetPositionAndRotation(
-                rightPos,
-                camFacingRot * Quaternion.Euler(rightGloveRotationOffset));
+            rightHandTarget.SetPositionAndRotation(rightPos, camFacingRot);
         }
     }
 
