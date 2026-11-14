@@ -63,25 +63,32 @@ namespace XRMultiplayer
         /// <inheritdoc/>
         private void Update()
         {
-            if (m_HeadVisualsRoot == null || m_HeadTransform == null || m_Neck == null || m_TorsoParentTransform == null) return;
-
-            // Update Head.
-            m_HeadVisualsRoot.position = m_HeadTransform.position;
-            m_HeadVisualsRoot.position -= m_HeadTransform.up * m_HeadHeightOffset;
-            m_Neck.rotation = m_HeadTransform.rotation;
-
-            // Update Body.
-            m_Transform.position = m_HeadTransform.position;
-            m_TorsoParentTransform.rotation = Quaternion.Slerp(m_TorsoParentTransform.rotation, Quaternion.Euler(new Vector3(0, m_DestinationY, 0)), Time.deltaTime * m_RotateSpeed);
-
-            // Rotate Body if past threshold.
-            if (Mathf.Abs(m_TorsoParentTransform.eulerAngles.y - m_HeadTransform.eulerAngles.y) >= m_RotateThreshold)
+            try
             {
-                m_DestinationY = m_HeadTransform.transform.eulerAngles.y;
-            }
+                if (m_HeadVisualsRoot == null || m_HeadTransform == null || m_Neck == null || m_TorsoParentTransform == null) return;
 
-            // Update scale.
-            m_HeadVisualsRoot.localScale = m_HeadTransform.localScale;
+                // Update Head.
+                m_HeadVisualsRoot.position = m_HeadTransform.position;
+                m_HeadVisualsRoot.position -= m_HeadTransform.up * m_HeadHeightOffset;
+                m_Neck.rotation = m_HeadTransform.rotation;
+
+                // Update Body.
+                m_Transform.position = m_HeadTransform.position;
+                m_TorsoParentTransform.rotation = Quaternion.Slerp(m_TorsoParentTransform.rotation, Quaternion.Euler(new Vector3(0, m_DestinationY, 0)), Time.deltaTime * m_RotateSpeed);
+
+                // Rotate Body if past threshold.
+                if (Mathf.Abs(m_TorsoParentTransform.eulerAngles.y - m_HeadTransform.eulerAngles.y) >= m_RotateThreshold)
+                {
+                    m_DestinationY = m_HeadTransform.transform.eulerAngles.y;
+                }
+
+                // Update scale.
+                m_HeadVisualsRoot.localScale = m_HeadTransform.localScale;
+            }
+            catch (MissingReferenceException)
+            {
+                // Visual root object was removed or destroyed
+            }
         }
     }
 }

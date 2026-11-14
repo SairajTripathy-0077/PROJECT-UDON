@@ -269,7 +269,10 @@ public class PlayerHealth : NetworkBehaviour
         body.transform.localScale = new Vector3(bodyRadius * 2f, bodyHeight * 0.5f, bodyRadius * 2f);
         ScaleModelToTargetHeight(modelRoot);
         AlignModelFeetToOrigin(modelRoot);
-        AlignBodyHitboxToModel(modelRoot);
+        if (!useBb8Visual)
+        {
+            AlignBodyHitboxToModel(modelRoot);
+        }
 
         headPose = FindChildNamed(transform, "Head");
         leftHandPose = FindChildNamed(transform, "Left Hand");

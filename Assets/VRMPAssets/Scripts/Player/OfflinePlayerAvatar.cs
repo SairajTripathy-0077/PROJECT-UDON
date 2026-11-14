@@ -103,7 +103,7 @@ namespace XRMultiplayer
         void OnDisable()
         {
             XRINetworkGameManager.LocalPlayerColor.Unsubscribe(UpdatePlayerColor);
-            VoiceChatManager.s_HasMicrophonePermission.Subscribe(MicrophonePermissionGranted);
+            VoiceChatManager.s_HasMicrophonePermission.Unsubscribe(MicrophonePermissionGranted);
             StopMicrophone();
             XRINetworkGameManager.Connected.Unsubscribe(connected =>
             {
@@ -114,27 +114,39 @@ namespace XRMultiplayer
         /// <inheritdoc/>
         private void LateUpdate()
         {
-            if (m_HeadTransform == null || m_HeadOrigin == null) return;
-            m_HeadTransform.SetPositionAndRotation(m_HeadOrigin.position, m_HeadOrigin.rotation);
+            try
+            {
+                if (m_HeadTransform == null || m_HeadOrigin == null) return;
+                m_HeadTransform.SetPositionAndRotation(m_HeadOrigin.position, m_HeadOrigin.rotation);
+            }
+            catch (MissingReferenceException)
+            {
+            }
         }
 
         /// <inheritdoc/>
         void Update()
         {
-            if (m_HeadRend == null) return;
-            if (!s_Muted)
+            try
             {
-                m_MicLoudness = LevelMax();
+                if (m_HeadRend == null) return;
+                if (!s_Muted)
+                {
+                    m_MicLoudness = LevelMax();
 
-                m_VoiceDestinationVolume = Mathf.Clamp01(Mathf.Lerp(m_VoiceDestinationVolume, m_MicLoudness, Time.deltaTime * m_MouthBlendSmoothing));
+                    m_VoiceDestinationVolume = Mathf.Clamp01(Mathf.Lerp(m_VoiceDestinationVolume, m_MicLoudness, Time.deltaTime * m_MouthBlendSmoothing));
 
-                float appliedCurve = m_VoiceCurve.Evaluate(m_VoiceDestinationVolume);
-                voiceAmp.Value = appliedCurve;
-                m_HeadRend.SetBlendShapeWeight(0, 100 - appliedCurve * 100);
+                    float appliedCurve = m_VoiceCurve.Evaluate(m_VoiceDestinationVolume);
+                    voiceAmp.Value = appliedCurve;
+                    m_HeadRend.SetBlendShapeWeight(0, 100 - appliedCurve * 100);
+                }
+                else
+                {
+                    voiceAmp.Value = 0.0f;
+                }
             }
-            else
+            catch (MissingReferenceException)
             {
-                voiceAmp.Value = 0.0f;
             }
         }
 
@@ -148,7 +160,14 @@ namespace XRMultiplayer
 
         void UpdatePlayerColor(Color color)
         {
-            m_HeadRend.materials[2].color = color;
+            try
+            {
+                if (m_HeadRend != null && m_HeadRend.materials != null && m_HeadRend.materials.Length > 2)
+                    m_HeadRend.materials[2].color = color;
+            }
+            catch (MissingReferenceException)
+            {
+            }
         }
 
         /// <summary>
