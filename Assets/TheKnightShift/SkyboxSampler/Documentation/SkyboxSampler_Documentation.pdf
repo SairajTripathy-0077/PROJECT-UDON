@@ -1,0 +1,334 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] /Count 6 >>
+endobj
+5 0 obj
+<< /Length 1588 >>
+stream
+BT /F2 26 Tf 72 600 Td (Skybox Sampler) Tj ET
+BT /F1 14 Tf 72 566 Td (9 free stylized skies for Unity) Tj ET
+BT /F1 10.5 Tf 72 544 Td (Version 1.0.0  -  The_KnightShift) Tj ET
+BT /F2 15 Tf 72 504 Td (Contents) Tj ET
+BT /F1 10.5 Tf 82 480 Td (1.  Overview ...................................................................... 2) Tj ET
+BT /F1 10.5 Tf 82 466 Td (2.  Package contents .............................................................. 2) Tj ET
+BT /F1 10.5 Tf 82 452 Td (3.  The 9 skies and their packs ................................................... 2) Tj ET
+BT /F1 10.5 Tf 82 438 Td (4.  Quick start \(setup guide\) ..................................................... 3) Tj ET
+BT /F1 10.5 Tf 82 424 Td (5.  Render pipelines .............................................................. 4) Tj ET
+BT /F1 10.5 Tf 82 410 Td (6.  Demo scene .................................................................... 4) Tj ET
+BT /F1 10.5 Tf 82 396 Td (7.  Panoramas ..................................................................... 4) Tj ET
+BT /F1 10.5 Tf 82 382 Td (8.  Script reference: SkyboxCycler ................................................ 5) Tj ET
+BT /F1 10.5 Tf 82 368 Td (9.  Import settings ............................................................... 5) Tj ET
+BT /F1 10.5 Tf 82 354 Td (10.  Troubleshooting .............................................................. 6) Tj ET
+BT /F1 10.5 Tf 82 340 Td (11.  License, support and AI disclosure ........................................... 6) Tj ET
+BT /F1 8.5 Tf 72 36 Td (Skybox Sampler  -  page 1 of 6) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Contents 5 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> >>
+endobj
+7 0 obj
+<< /Length 4184 >>
+stream
+BT /F2 15 Tf 72 731.6 Td (1. Overview) Tj ET
+BT /F1 10.5 Tf 72 707.8 Td (Skybox Sampler is a free package of 9 stylized skies for Unity: three space skies,) Tj ET
+BT /F1 10.5 Tf 72 693.8 Td (three outdoor skies and three alien worlds, three from each of our three sky packs) Tj ET
+BT /F1 10.5 Tf 72 679.8 Td (\(Space Skyboxes, Stylized Sky Skyboxes and Alien Worlds Skyboxes\).) Tj ET
+BT /F1 10.5 Tf 72 659.5 Td (Every sky is a Skybox/6 Sided material with its six 512x512 PNG cube faces already) Tj ET
+BT /F1 10.5 Tf 72 645.5 Td (assigned, plus a lossless 2048x1024 PNG equirectangular panorama for) Tj ET
+BT /F1 10.5 Tf 72 631.5 Td (Skybox/Panoramic or cubemap workflows. A demo scene and a small SkyboxCycler script) Tj ET
+BT /F1 10.5 Tf 72 617.5 Td (let you flip through all 9 skies with the arrow keys.) Tj ET
+BT /F1 10.5 Tf 72 597.2 Td (All 52 skies of the three packs, with 1024x1024 cube faces, are in our paid package) Tj ET
+BT /F1 10.5 Tf 72 583.2 Td ("Stylized Skybox Collection" on the Unity Asset Store \(publisher The_KnightShift\).) Tj ET
+BT /F1 10.5 Tf 72 569.2 Td (This sampler uses the same folders and material names, so a sky you try here keeps) Tj ET
+BT /F1 10.5 Tf 72 555.2 Td (its name there.) Tj ET
+BT /F1 10.5 Tf 72 534.9 Td (Quick start: open Demo/Demo.unity, press Play and use the Left / Right arrow keys to) Tj ET
+BT /F1 10.5 Tf 72 520.9 Td (step through all 9 skies. Importing the package does not open the scene by itself.) Tj ET
+BT /F1 10.5 Tf 72 500.6 Td (Requirements: uploaded from Unity 6 \(6000.0\); older versions are not tested. The) Tj ET
+BT /F1 10.5 Tf 72 486.6 Td (Built-in Render Pipeline uses the materials directly; for URP see section 5 \(stated) Tj ET
+BT /F1 10.5 Tf 72 472.6 Td (per release on the Asset Store page\); HDRP uses a panorama through its HDRI Sky) Tj ET
+BT /F1 10.5 Tf 72 458.6 Td (\(section 5\). No other packages are required.) Tj ET
+BT /F2 15 Tf 72 429.9 Td (2. Package contents) Tj ET
+BT /F1 10.5 Tf 72 406.1 Td (Everything is installed under Assets/TheKnightShift/SkyboxSampler, one folder per) Tj ET
+BT /F1 10.5 Tf 72 392.1 Td (pack \(Space, StylizedSky, AlienWorlds\):) Tj ET
+BT /F3 8.5 Tf 82 371.8 Td (<Pack>/Materials/<Pack>_<sky>.mat          9 materials \(Skybox/6 Sided\)) Tj ET
+BT /F3 8.5 Tf 82 359.2 Td (<Pack>/Cubemaps/<sky>/{Front,Back,Left,Right,Up,Down}.png   6 x 512x512 per sky) Tj ET
+BT /F3 8.5 Tf 82 346.6 Td (<Pack>/Panoramas/<sky>.png                 9 panoramas, 2048x1024 PNG) Tj ET
+BT /F3 8.5 Tf 82 334 Td (Demo/Demo.unity                            demo scene with the SkyboxCycler) Tj ET
+BT /F3 8.5 Tf 82 321.4 Td (Scripts/SkyboxCycler.cs                    arrow-key sky switcher) Tj ET
+BT /F3 8.5 Tf 82 308.8 Td (                      \(namespace TheKnightShift.SkyboxSampler\)) Tj ET
+BT /F3 8.5 Tf 82 296.2 Td (Documentation/SkyboxSampler_Documentation.pdf   this document) Tj ET
+BT /F3 8.5 Tf 82 283.6 Td (README.txt, LICENSE.txt) Tj ET
+BT /F1 10.5 Tf 72 271 Td (Totals: 9 materials, 54 cube-face PNGs, 9 panorama PNGs, 1 scene, 1 script. All) Tj ET
+BT /F1 10.5 Tf 72 257 Td (images are 8-bit sRGB \(LDR\) PNG files; there are no HDR/EXR files and no reflection) Tj ET
+BT /F1 10.5 Tf 72 243 Td (probes.) Tj ET
+BT /F2 15 Tf 72 214.3 Td (3. The 9 skies and their packs) Tj ET
+BT /F1 10.5 Tf 78 190.5 Td (-) Tj ET
+BT /F1 10.5 Tf 90 190.5 Td (01 Teal & Magenta Nebula \(Space Skyboxes\) - emission gas in teal and magenta cut) Tj ET
+BT /F1 10.5 Tf 90 176.5 Td (by dark dust lanes.) Tj ET
+BT /F1 10.5 Tf 78 158.3 Td (-) Tj ET
+BT /F1 10.5 Tf 90 158.3 Td (02 Ringed Gas Giant \(Space Skyboxes\) - a banded gas giant with a tilted ring) Tj ET
+BT /F1 10.5 Tf 90 144.3 Td (system, lit from the side.) Tj ET
+BT /F1 10.5 Tf 78 126.1 Td (-) Tj ET
+BT /F1 10.5 Tf 90 126.1 Td (03 Supernova Remnant \(Space Skyboxes\) - a huge shell of filaments in teal, red) Tj ET
+BT /F1 10.5 Tf 90 112.1 Td (and violet around a dying star.) Tj ET
+BT /F1 10.5 Tf 78 93.9 Td (-) Tj ET
+BT /F1 10.5 Tf 90 93.9 Td (04 Golden Hour \(Stylized Sky Skyboxes\) - low warm sun, glowing cumulus with) Tj ET
+BT /F1 10.5 Tf 90 79.9 Td (bright rims and long shadows.) Tj ET
+BT /F1 8.5 Tf 72 36 Td (Skybox Sampler  -  page 2 of 6) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Contents 7 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> >>
+endobj
+9 0 obj
+<< /Length 4540 >>
+stream
+BT /F1 10.5 Tf 78 740 Td (-) Tj ET
+BT /F1 10.5 Tf 90 740 Td (05 Thunderstorm \(Stylized Sky Skyboxes\) - towering dark storm clouds, a) Tj ET
+BT /F1 10.5 Tf 90 726 Td (green-grey light and a forked lightning strike.) Tj ET
+BT /F1 10.5 Tf 78 707.8 Td (-) Tj ET
+BT /F1 10.5 Tf 90 707.8 Td (06 Moonlit Night \(Stylized Sky Skyboxes\) - navy sky, a bright moon with a halo,) Tj ET
+BT /F1 10.5 Tf 90 693.8 Td (silver-edged clouds and stars.) Tj ET
+BT /F1 10.5 Tf 78 675.6 Td (-) Tj ET
+BT /F1 10.5 Tf 90 675.6 Td (07 Ringed Giant over Ocean \(Alien Worlds Skyboxes\) - a ringed gas giant fills) Tj ET
+BT /F1 10.5 Tf 90 661.6 Td (the afternoon sky above a calm ocean that mirrors its rings.) Tj ET
+BT /F1 10.5 Tf 78 643.4 Td (-) Tj ET
+BT /F1 10.5 Tf 90 643.4 Td (08 Volcanic Ash World \(Alien Worlds Skyboxes\) - smothering ash clouds lit orange) Tj ET
+BT /F1 10.5 Tf 90 629.4 Td (from below by rivers of lava, a smoking cone and cracked basalt underfoot.) Tj ET
+BT /F1 10.5 Tf 78 611.2 Td (-) Tj ET
+BT /F1 10.5 Tf 90 611.2 Td (09 Tidally-Locked Terminator \(Alien Worlds Skyboxes\) - a huge sun hangs) Tj ET
+BT /F1 10.5 Tf 90 597.2 Td (half-risen on the horizon: a glowing day side melts into a star-filled night.) Tj ET
+BT /F1 10.5 Tf 72 579 Td (Each pack is in the Stylized Skybox Collection on the Unity Asset Store. The packs) Tj ET
+BT /F1 10.5 Tf 72 565 Td (also have pages on itch.io:) Tj ET
+BT /F3 8.5 Tf 82 544.7 Td (Space Skyboxes         https://the-knightshift.itch.io/space-skyboxes) Tj ET
+BT /F3 8.5 Tf 82 532.1 Td (Stylized Sky Skyboxes  https://the-knightshift.itch.io/stylized-skyboxes) Tj ET
+BT /F3 8.5 Tf 82 519.5 Td (Alien Worlds Skyboxes  https://the-knightshift.itch.io/alien-skyboxes) Tj ET
+BT /F2 11.5 Tf 72 504.1 Td (Facing: the preset Rotation of each material) Tj ET
+BT /F1 10.5 Tf 72 486.6 Td (Each sky's main feature sits at its own bearing in the images. Every material's) Tj ET
+BT /F1 10.5 Tf 72 472.6 Td (Rotation is preset so that the feature is in front of a camera looking along +Z, the) Tj ET
+BT /F1 10.5 Tf 72 458.6 Td (default direction of a new Unity camera. The features are about 4 to 37 degrees) Tj ET
+BT /F1 10.5 Tf 72 444.6 Td (above the horizon \(Moonlit Night's moon is the highest\); the demo camera looks 10) Tj ET
+BT /F1 10.5 Tf 72 430.6 Td (degrees up. Sky 9, Tidally-Locked Terminator, has files and a material named) Tj ET
+BT /F1 10.5 Tf 72 416.6 Td (TidallyLockedTwilight. To face another way, change Rotation \(0-360\). A) Tj ET
+BT /F1 10.5 Tf 72 402.6 Td (Skybox/Panoramic material made from a panorama needs the same Rotation for the same) Tj ET
+BT /F1 10.5 Tf 72 388.6 Td (facing:) Tj ET
+BT /F3 8.5 Tf 82 368.3 Td (01 Teal & Magenta Nebula      Rotation   0) Tj ET
+BT /F3 8.5 Tf 82 355.7 Td (02 Ringed Gas Giant           Rotation   0) Tj ET
+BT /F3 8.5 Tf 82 343.1 Td (03 Supernova Remnant          Rotation   0) Tj ET
+BT /F3 8.5 Tf 82 330.5 Td (04 Golden Hour                Rotation  15) Tj ET
+BT /F3 8.5 Tf 82 317.9 Td (05 Thunderstorm               Rotation 348) Tj ET
+BT /F3 8.5 Tf 82 305.3 Td (06 Moonlit Night              Rotation 335) Tj ET
+BT /F3 8.5 Tf 82 292.7 Td (07 Ringed Giant over Ocean    Rotation 356) Tj ET
+BT /F3 8.5 Tf 82 280.1 Td (08 Volcanic Ash World         Rotation   0) Tj ET
+BT /F3 8.5 Tf 82 267.5 Td (09 Tidally-Locked Terminator  Rotation  55) Tj ET
+BT /F2 15 Tf 72 246.5 Td (4. Quick start \(setup guide\)) Tj ET
+BT /F1 10.5 Tf 78 222.7 Td (-) Tj ET
+BT /F1 10.5 Tf 90 222.7 Td (1. Import the package \(Assets > Import Package > Custom Package, or from My) Tj ET
+BT /F1 10.5 Tf 90 208.7 Td (Assets in the Package Manager\). Keep everything selected and press Import.) Tj ET
+BT /F1 10.5 Tf 78 190.5 Td (-) Tj ET
+BT /F1 10.5 Tf 90 190.5 Td (2. Open Window > Rendering > Lighting and select the Environment tab.) Tj ET
+BT /F1 10.5 Tf 78 172.3 Td (-) Tj ET
+BT /F1 10.5 Tf 90 172.3 Td (3. Drag any material from a Materials folder \(for example) Tj ET
+BT /F1 10.5 Tf 90 158.3 Td (Space/Materials/Space_01_TealMagentaNebula.mat\) into the Skybox Material slot.) Tj ET
+BT /F1 10.5 Tf 90 144.3 Td (The sky appears in the Scene and Game views at once.) Tj ET
+BT /F1 10.5 Tf 78 126.1 Td (-) Tj ET
+BT /F1 10.5 Tf 90 126.1 Td (4. For lighting from the sky, set Environment Lighting > Source to Skybox and) Tj ET
+BT /F1 10.5 Tf 90 112.1 Td (press Generate Lighting \(or enable Auto Generate\). Reflections follow the sky) Tj ET
+BT /F1 10.5 Tf 90 98.1 Td (when Environment Reflections > Source is Skybox.) Tj ET
+BT /F1 8.5 Tf 72 36 Td (Skybox Sampler  -  page 3 of 6) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Contents 9 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> >>
+endobj
+11 0 obj
+<< /Length 3802 >>
+stream
+BT /F1 10.5 Tf 78 740 Td (-) Tj ET
+BT /F1 10.5 Tf 90 740 Td (5. Optional: adjust the material's Exposure \(brightness\) and Rotation \(turn the) Tj ET
+BT /F1 10.5 Tf 90 726 Td (sky around the vertical axis; preset per sky, section 3\) in the Inspector. Tint) Tj ET
+BT /F1 10.5 Tf 90 712 Td (multiplies the colour.) Tj ET
+BT /F1 10.5 Tf 72 693.8 Td (To change the sky from code, set RenderSettings.skybox to any of the materials and) Tj ET
+BT /F1 10.5 Tf 72 679.8 Td (call DynamicGI.UpdateEnvironment\(\) so ambient lighting follows; SkyboxCycler.cs does) Tj ET
+BT /F1 10.5 Tf 72 665.8 Td (exactly this.) Tj ET
+BT /F2 15 Tf 72 637.1 Td (5. Render pipelines) Tj ET
+BT /F2 11.5 Tf 72 610.5 Td (Built-in Render Pipeline) Tj ET
+BT /F1 10.5 Tf 72 593 Td (Use the materials directly as described in the quick start.) Tj ET
+BT /F2 11.5 Tf 72 569.9 Td (Universal Render Pipeline \(URP\)) Tj ET
+BT /F1 10.5 Tf 72 552.4 Td (URP renders Unity's built-in Skybox/6 Sided and Skybox/Panoramic shaders, so the) Tj ET
+BT /F1 10.5 Tf 72 538.4 Td (materials are assigned in Lighting > Environment > Skybox Material exactly as in the) Tj ET
+BT /F1 10.5 Tf 72 524.4 Td (Built-in pipeline, and the package has no custom shaders to convert. Whether this) Tj ET
+BT /F1 10.5 Tf 72 510.4 Td (release was checked in URP is stated in the render pipeline table on its Asset Store) Tj ET
+BT /F1 10.5 Tf 72 496.4 Td (page; if it is not listed there, treat URP as untested.) Tj ET
+BT /F2 11.5 Tf 72 473.3 Td (High Definition Render Pipeline \(HDRP\)) Tj ET
+BT /F1 10.5 Tf 72 455.8 Td (HDRP does not read the scene skybox material; it draws the sky from a Volume.) Tj ET
+BT /F1 10.5 Tf 72 441.8 Td (Unity's documented route: select a panorama PNG, set Texture Shape to Cube, Mapping) Tj ET
+BT /F1 10.5 Tf 72 427.8 Td (to Latitude-Longitude Layout \(Cylindrical\), apply, then add an HDRI Sky override to) Tj ET
+BT /F1 10.5 Tf 72 413.8 Td (a Volume, assign the cubemap and set Visual Environment > Sky Type to HDRI Sky. The) Tj ET
+BT /F1 10.5 Tf 72 399.8 Td (panoramas are LDR, so raise the HDRI Sky Exposure to taste. We have not tested this) Tj ET
+BT /F1 10.5 Tf 72 385.8 Td (package in HDRP.) Tj ET
+BT /F2 15 Tf 72 357.1 Td (6. Demo scene) Tj ET
+BT /F1 10.5 Tf 72 333.3 Td (Open Demo/Demo.unity. It contains a camera tilted 10 degrees up, a directional light) Tj ET
+BT /F1 10.5 Tf 72 319.3 Td (and a GameObject named SkyboxCycler whose Skyboxes array lists all 9 materials.) Tj ET
+BT /F1 10.5 Tf 72 305.3 Td (Press Play, then use the Left and Right arrow keys to step through the skies; the) Tj ET
+BT /F1 10.5 Tf 72 291.3 Td (current index and material name \(which starts with the pack: Space_, StylizedSky_ or) Tj ET
+BT /F1 10.5 Tf 72 277.3 Td (Alien_\) are shown at the top left.) Tj ET
+BT /F1 10.5 Tf 72 257 Td (The scene has no meshes and no baked lighting, so it opens without a bake and) Tj ET
+BT /F1 10.5 Tf 72 243 Td (nothing in it depends on the render pipeline. The cycler reads the keys through) Tj ET
+BT /F1 10.5 Tf 72 229 Td (whichever input handling the project uses \(Project Settings > Player > Active Input) Tj ET
+BT /F1 10.5 Tf 72 215 Td (Handling: Input Manager \(Old\), Input System Package \(New\), or Both\), so no setting) Tj ET
+BT /F1 10.5 Tf 72 201 Td (needs changing.) Tj ET
+BT /F2 15 Tf 72 172.3 Td (7. Panoramas) Tj ET
+BT /F1 10.5 Tf 72 148.5 Td (Each sky's <Pack>/Panoramas/<sky>.png is a 2048x1024 equirectangular image already) Tj ET
+BT /F1 10.5 Tf 72 134.5 Td (oriented for Unity's Skybox/Panoramic shader so that it matches the six cube faces) Tj ET
+BT /F1 10.5 Tf 72 120.5 Td (of the same sky \(with Rotation 0; give the Panoramic material the 6-sided material's) Tj ET
+BT /F1 10.5 Tf 72 106.5 Td (Rotation for the same facing\).) Tj ET
+BT /F1 8.5 Tf 72 36 Td (Skybox Sampler  -  page 4 of 6) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Contents 11 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> >>
+endobj
+13 0 obj
+<< /Length 4020 >>
+stream
+BT /F1 10.5 Tf 78 740 Td (-) Tj ET
+BT /F1 10.5 Tf 90 740 Td (Skybox/Panoramic material: create a material, choose shader Skybox/Panoramic,) Tj ET
+BT /F1 10.5 Tf 90 726 Td (set Mapping to Latitude Longitude Layout and Image Type to 360 Degrees, and) Tj ET
+BT /F1 10.5 Tf 90 712 Td (assign the PNG to Spherical \(HDR\).) Tj ET
+BT /F1 10.5 Tf 78 693.8 Td (-) Tj ET
+BT /F1 10.5 Tf 90 693.8 Td (Cubemap asset: in the texture's import settings set Texture Shape to Cube and) Tj ET
+BT /F1 10.5 Tf 90 679.8 Td (Mapping to Latitude-Longitude Layout; Unity builds the six faces for you \(used) Tj ET
+BT /F1 10.5 Tf 90 665.8 Td (by HDRP and reflection probes\).) Tj ET
+BT /F1 10.5 Tf 72 647.6 Td (The panoramas are imported as plain 2D textures with Wrap Mode Repeat and mipmaps) Tj ET
+BT /F1 10.5 Tf 72 633.6 Td (off \(mipmaps produce a faint seam on lat-long images\). They are lossless PNGs, so) Tj ET
+BT /F1 10.5 Tf 72 619.6 Td (re-saving them is safe.) Tj ET
+BT /F2 15 Tf 72 590.9 Td (8. Script reference: SkyboxCycler) Tj ET
+BT /F3 8.5 Tf 82 567.1 Td (namespace TheKnightShift.SkyboxSampler) Tj ET
+BT /F3 8.5 Tf 82 554.5 Td (public class SkyboxCycler : MonoBehaviour) Tj ET
+BT /F1 10.5 Tf 72 541.9 Td (A small MonoBehaviour for previewing skies. Add it to any GameObject. Its own) Tj ET
+BT /F1 10.5 Tf 72 527.9 Td (namespace means it does not clash with the SkyboxCycler of our other sky packages if) Tj ET
+BT /F1 10.5 Tf 72 513.9 Td (you import several.) Tj ET
+BT /F2 11.5 Tf 72 490.8 Td (Public fields) Tj ET
+BT /F1 10.5 Tf 78 473.3 Td (-) Tj ET
+BT /F1 10.5 Tf 90 473.3 Td (Material[] skyboxes - the materials to cycle through, in order. Fill it in the) Tj ET
+BT /F1 10.5 Tf 90 459.3 Td (Inspector \(lock the Inspector, select the materials in the Project window and) Tj ET
+BT /F1 10.5 Tf 90 445.3 Td (drag them onto the array header\).) Tj ET
+BT /F1 10.5 Tf 78 427.1 Td (-) Tj ET
+BT /F1 10.5 Tf 90 427.1 Td (bool showLabel \(default true\) - shows '<index>/<count> <material name>) Tj ET
+BT /F1 10.5 Tf 90 413.1 Td (\(Left/Right arrow\)' at the top left of the Game view with OnGUI.) Tj ET
+BT /F2 11.5 Tf 72 392.1 Td (Behaviour) Tj ET
+BT /F1 10.5 Tf 78 374.6 Td (-) Tj ET
+BT /F1 10.5 Tf 90 374.6 Td (Start\(\): applies skyboxes[0] if the array is not empty.) Tj ET
+BT /F1 10.5 Tf 78 356.4 Td (-) Tj ET
+BT /F1 10.5 Tf 90 356.4 Td (Update\(\): Right arrow applies the next material, Left arrow the previous one;) Tj ET
+BT /F1 10.5 Tf 90 342.4 Td (wraps around at both ends.) Tj ET
+BT /F1 10.5 Tf 78 324.2 Td (-) Tj ET
+BT /F1 10.5 Tf 90 324.2 Td (Apply\(int i\) \(private\): sets RenderSettings.skybox and calls) Tj ET
+BT /F1 10.5 Tf 90 310.2 Td (DynamicGI.UpdateEnvironment\(\) so ambient light follows the new sky. Copy this) Tj ET
+BT /F1 10.5 Tf 90 296.2 Td (method if you want to switch skies from your own code.) Tj ET
+BT /F1 10.5 Tf 72 278 Td (Input: with the Input System package active \(ENABLE_INPUT_SYSTEM\) the script reads) Tj ET
+BT /F1 10.5 Tf 72 264 Td (Keyboard.current; with the classic Input Manager \(ENABLE_LEGACY_INPUT_MANAGER\) it) Tj ET
+BT /F1 10.5 Tf 72 250 Td (reads UnityEngine.Input; with Both it accepts either. It has no dependencies on) Tj ET
+BT /F1 10.5 Tf 72 236 Td (other scripts or packages and can be deleted without affecting the materials.) Tj ET
+BT /F2 15 Tf 72 207.3 Td (9. Import settings) Tj ET
+BT /F1 10.5 Tf 72 183.5 Td (The package ships .meta files, so these settings are applied on import and nothing) Tj ET
+BT /F1 10.5 Tf 72 169.5 Td (needs changing:) Tj ET
+BT /F1 10.5 Tf 78 149.2 Td (-) Tj ET
+BT /F1 10.5 Tf 90 149.2 Td (Cube faces \(54 PNGs\): Texture Type Default, sRGB on, Wrap Mode Clamp, mipmaps) Tj ET
+BT /F1 10.5 Tf 90 135.2 Td (off, Filter Bilinear, uncompressed \(Compression None\).) Tj ET
+BT /F1 10.5 Tf 78 117 Td (-) Tj ET
+BT /F1 10.5 Tf 90 117 Td (Panoramas \(9 PNGs\): Texture Type Default, sRGB on, Wrap Mode Repeat, mipmaps) Tj ET
+BT /F1 10.5 Tf 90 103 Td (off, Filter Bilinear, uncompressed.) Tj ET
+BT /F1 8.5 Tf 72 36 Td (Skybox Sampler  -  page 5 of 6) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Contents 13 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> >>
+endobj
+15 0 obj
+<< /Length 3071 >>
+stream
+BT /F1 10.5 Tf 72 740 Td (To shrink builds, select the textures and set Compression to Normal Quality \(or a) Tj ET
+BT /F1 10.5 Tf 72 726 Td (platform override\); Clamp wrap must stay on the cube faces or a thin line appears at) Tj ET
+BT /F1 10.5 Tf 72 712 Td (the cube edges.) Tj ET
+BT /F2 15 Tf 72 683.3 Td (10. Troubleshooting) Tj ET
+BT /F1 10.5 Tf 78 659.5 Td (-) Tj ET
+BT /F1 10.5 Tf 90 659.5 Td (Sky is blank or shows the default blue: the Skybox Material slot in Lighting >) Tj ET
+BT /F1 10.5 Tf 90 645.5 Td (Environment is empty, or the Camera's Clear Flags is not Skybox.) Tj ET
+BT /F1 10.5 Tf 78 627.3 Td (-) Tj ET
+BT /F1 10.5 Tf 90 627.3 Td (A thin seam at the cube edges: one of the six face textures lost its Clamp wrap) Tj ET
+BT /F1 10.5 Tf 90 613.3 Td (mode; reset it.) Tj ET
+BT /F1 10.5 Tf 78 595.1 Td (-) Tj ET
+BT /F1 10.5 Tf 90 595.1 Td (Sky looks too dark or bright: change Exposure on the material \(the images are) Tj ET
+BT /F1 10.5 Tf 90 581.1 Td (LDR, not HDR\).) Tj ET
+BT /F1 10.5 Tf 78 562.9 Td (-) Tj ET
+BT /F1 10.5 Tf 90 562.9 Td (The main feature of a sky is behind you: your camera does not look along +Z;) Tj ET
+BT /F1 10.5 Tf 90 548.9 Td (change the material's Rotation \(degrees around the vertical axis\) or turn the) Tj ET
+BT /F1 10.5 Tf 90 534.9 Td (camera.) Tj ET
+BT /F1 10.5 Tf 78 516.7 Td (-) Tj ET
+BT /F1 10.5 Tf 90 516.7 Td (Arrow keys do nothing in the demo: make sure Demo/Demo.unity is the open scene,) Tj ET
+BT /F1 10.5 Tf 90 502.7 Td (that Play mode is on and the Game view has focus \(click it once\).) Tj ET
+BT /F1 10.5 Tf 78 484.5 Td (-) Tj ET
+BT /F1 10.5 Tf 90 484.5 Td (HDRP shows no sky: HDRP ignores the scene skybox material; follow section 5) Tj ET
+BT /F1 10.5 Tf 90 470.5 Td (\(HDRI Sky\).) Tj ET
+BT /F2 15 Tf 72 443.9 Td (11. License, support and AI disclosure) Tj ET
+BT /F1 10.5 Tf 72 420.1 Td (License: free. Your licence is the Unity Asset Store End User License Agreement) Tj ET
+BT /F1 10.5 Tf 72 406.1 Td (\(https://unity.com/legal/as-terms\). See LICENSE.txt.) Tj ET
+BT /F1 10.5 Tf 72 385.8 Td (Support: use the support contact on this package's Asset Store page, or leave a) Tj ET
+BT /F1 10.5 Tf 72 371.8 Td (comment on https://the-knightshift.itch.io/skybox-sampler. Please include your Unity) Tj ET
+BT /F1 10.5 Tf 72 357.8 Td (version and render pipeline.) Tj ET
+BT /F1 10.5 Tf 72 337.5 Td (AI disclosure: these skies were generated by procedural Python code that was written) Tj ET
+BT /F1 10.5 Tf 72 323.5 Td (with an AI coding assistant \(Claude, by Anthropic\). No photos and no) Tj ET
+BT /F1 10.5 Tf 72 309.5 Td (image-generation model were used. The SkyboxCycler script, demo scene, material) Tj ET
+BT /F1 10.5 Tf 72 295.5 Td (files, this documentation and the README were also written with AI assistance) Tj ET
+BT /F1 10.5 Tf 72 281.5 Td (\(Claude\). The publisher opens the package in the Unity Editor and checks it by eye) Tj ET
+BT /F1 10.5 Tf 72 267.5 Td (before release. The package contains no AI-generated audio or 3D models.) Tj ET
+BT /F1 8.5 Tf 72 36 Td (Skybox Sampler  -  page 6 of 6) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Contents 15 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> >>
+endobj
+17 0 obj
+<< /Title (Skybox Sampler) /Author (The_KnightShift) /Producer (make_documentation.py) >>
+endobj
+18 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000015 00000 n 
+0000000112 00000 n 
+0000000214 00000 n 
+0000000309 00000 n 
+0000000400 00000 n 
+0000002040 00000 n 
+0000002186 00000 n 
+0000006422 00000 n 
+0000006568 00000 n 
+0000011160 00000 n 
+0000011307 00000 n 
+0000015162 00000 n 
+0000015310 00000 n 
+0000019383 00000 n 
+0000019531 00000 n 
+0000022655 00000 n 
+0000022803 00000 n 
+0000022909 00000 n 
+trailer
+<< /Size 19 /Root 18 0 R /Info 17 0 R >>
+startxref
+22959
+%%EOF

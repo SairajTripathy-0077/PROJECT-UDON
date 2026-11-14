@@ -18,7 +18,6 @@ public sealed class DesktopPlayerController : NetworkBehaviour
     [SerializeField] private float sprintSpeed = 5.0f;
     [SerializeField] private float mouseSensitivity = 1.8f;
     [SerializeField] private float eyeHeight = 1.48f;
-    [SerializeField] private float ringRadius = 4.2f;
 
     [Header("Guard Tuning (Proportional to Midans Model)")]
     [SerializeField] private float leftGuardForward = 0.28f;
@@ -276,12 +275,11 @@ public sealed class DesktopPlayerController : NetworkBehaviour
             float speed = isSprinting ? sprintSpeed : walkSpeed;
             transform.position += worldDirection * (speed * Time.deltaTime);
 
-            // Ring perimeter boundary clamp
-            Vector3 centerOffset = transform.position;
-            centerOffset.y = 0f;
-            if (centerOffset.magnitude > ringRadius)
+            if (BoxingRingBoundary.Active != null)
             {
-                transform.position = centerOffset.normalized * ringRadius + Vector3.up * transform.position.y;
+                Vector3 clampedPosition = transform.position;
+                if (BoxingRingBoundary.Active.TryClampPosition(ref clampedPosition))
+                    transform.position = clampedPosition;
             }
         }
     }
