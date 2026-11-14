@@ -262,7 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -677,7 +677,7 @@ MonoBehaviour:
   scaleMultiplier: 1
   showHandSpheres: 1
   handSphereSize: 0.18
-  handColor: {r: 0.95, g: 0.35, b: 0.04, a: 1}
+  handColor: {r: 1, g: 1, b: 1, a: 1}
   handMetallic: 0.15
   handSmoothness: 0.65
   overrideCollider: 1
