@@ -23,6 +23,7 @@ public class VRBoxingUI : MonoBehaviour
     [SerializeField] private Vector3 menuOffset = new Vector3(0f, 1.35f, 1.25f);
     [SerializeField] private Vector3 scoreboardOffset = new Vector3(0f, 1.65f, 1.8f);
     [SerializeField] private Vector3 knockoutBannerOffset = new Vector3(0f, 1.45f, 1.4f);
+    [SerializeField] private Vector3 headsetHealthOffset = new Vector3(-0.45f, -0.3f, 1.15f);
 
     private GameObject vrMenuRoot;
     private Text vrStatusText;
@@ -34,6 +35,9 @@ public class VRBoxingUI : MonoBehaviour
     private Text p1HealthText;
     private Image p2HealthBar;
     private Text p2HealthText;
+    private GameObject headsetHealthRoot;
+    private Image headsetHealthBar;
+    private Text headsetHealthText;
 
     private GameObject wristCanvasObj;
     private Image wristFill;
@@ -75,6 +79,7 @@ public class VRBoxingUI : MonoBehaviour
     {
         BuildVRStartMenu();
         BuildVRScoreboard();
+        BuildHeadsetHealthDisplay();
         BuildVRKnockoutBanner();
     }
 
@@ -84,6 +89,7 @@ public class VRBoxingUI : MonoBehaviour
         UpdateMenuState();
         UpdateScoreboardBillboard();
         UpdateWristHealthDisplay();
+        UpdateHeadsetHealthDisplay();
     }
 
     private void CheckInputShortcuts()
@@ -415,7 +421,81 @@ public class VRBoxingUI : MonoBehaviour
             {
                 wristHpText.text = $"HP: {currentHp} / {maxHp}";
             }
+            UpdateHeadsetHealth(currentHp, maxHp);
         }
+    }
+
+    private void BuildHeadsetHealthDisplay()
+    {
+        headsetHealthRoot = new GameObject("Headset Health Display", typeof(RectTransform), typeof(Canvas));
+        headsetHealthRoot.transform.SetParent(transform, false);
+
+        Canvas canvas = headsetHealthRoot.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = Camera.main;
+
+        RectTransform rootRect = headsetHealthRoot.GetComponent<RectTransform>();
+        rootRect.sizeDelta = new Vector2(300f, 92f);
+        rootRect.localScale = Vector3.one * 0.0014f;
+
+        GameObject panel = CreateUIObject("Health Panel", headsetHealthRoot.transform);
+        RectTransform panelRect = panel.GetComponent<RectTransform>();
+        panelRect.sizeDelta = rootRect.sizeDelta;
+        Image panelImage = panel.AddComponent<Image>();
+        panelImage.color = new Color(0.02f, 0.035f, 0.08f, 0.9f);
+
+        headsetHealthText = CreateText("Health Text", panel.transform, 24, FontStyle.Bold, Color.white);
+        headsetHealthText.text = "YOUR HEALTH  100 / 100 HP";
+        headsetHealthText.rectTransform.anchoredPosition = new Vector2(0f, 24f);
+        headsetHealthText.rectTransform.sizeDelta = new Vector2(280f, 32f);
+
+        headsetHealthBar = CreateHealthBar(
+            "Health Bar",
+            panel.transform,
+            new Vector2(0f, -20f),
+            new Vector2(250f, 20f),
+            new Color(0.18f, 0.85f, 0.35f));
+
+        headsetHealthRoot.SetActive(false);
+    }
+
+    private void UpdateHeadsetHealthDisplay()
+    {
+        Transform headCam = GetHeadCamera();
+        if (headCam == null || headsetHealthRoot == null)
+            return;
+
+        NetworkManager nm = NetworkManager.Singleton;
+        PlayerHealth localHealth = null;
+        foreach (PlayerHealth player in FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            if (player.IsOwner)
+            {
+                localHealth = player;
+                break;
+            }
+        }
+        bool show = nm != null && nm.IsListening && localHealth != null && localHealth.IsOwner;
+        headsetHealthRoot.SetActive(show);
+        if (!show)
+            return;
+
+        headsetHealthRoot.transform.SetParent(headCam, false);
+        headsetHealthRoot.transform.localPosition = headsetHealthOffset;
+        headsetHealthRoot.transform.localRotation = Quaternion.identity;
+        headsetHealthRoot.transform.localScale = Vector3.one * 0.0014f;
+        UpdateHeadsetHealth(localHealth.currentHealth.Value, localHealth.MaxHealth);
+    }
+
+    private void UpdateHeadsetHealth(float currentHp, int maxHp)
+    {
+        if (headsetHealthBar == null || headsetHealthText == null)
+            return;
+
+        float fraction = maxHp > 0 ? Mathf.Clamp01(currentHp / maxHp) : 0f;
+        headsetHealthBar.fillAmount = fraction;
+        headsetHealthBar.color = Color.Lerp(Color.red, Color.green, fraction);
+        headsetHealthText.text = $"YOUR HEALTH  {currentHp:0.##} / {maxHp} HP";
     }
 
     private void UpdateScoreboardBillboard()
